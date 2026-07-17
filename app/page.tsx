@@ -12,7 +12,6 @@ import { useGameState } from "@/lib/useGameState";
 const quickLinks = [
   ["/members", "メンバー"],
   ["/teams", "チーム"],
-  ["/teams/compose", "編成"],
   ["/missions", "ミッション"],
   ["/items", "物資"],
   ["/auction", "オークション"],

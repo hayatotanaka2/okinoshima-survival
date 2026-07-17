@@ -1,8 +1,9 @@
-import { addEventLog, uid } from "./gameLogic";
+import { addEventLog, addNotification, uid } from "./gameLogic";
 import type { GameState, Member, Team } from "./types";
 
 const teamNames = ["赤チーム", "青チーム", "黄チーム", "緑チーム", "紫チーム", "白チーム"];
 const teamColors = ["#ff2b93", "#00bfd6", "#ffd83d", "#a8e600", "#6d4aff", "#ff7a45"];
+const organizerMemberIds = new Set(["member-6", "member-15", "member-20", "member-22"]);
 
 export function calculateTeamCoin(team: Team, members: Member[]): number {
   return team.memberIds.reduce((sum, memberId) => {
@@ -10,9 +11,8 @@ export function calculateTeamCoin(team: Team, members: Member[]): number {
   }, 0);
 }
 
-export function randomizeTeams(state: GameState, teamCount: number): GameState {
+export function buildRandomTeams(members: Member[], teamCount: number, spreadOrganizers = false): Team[] {
   const safeTeamCount = Math.max(2, Math.min(teamCount, 6));
-  const shuffled = [...state.members].sort(() => Math.random() - 0.5);
 
   const teams: Team[] = Array.from({ length: safeTeamCount }, (_, index) => ({
     id: `team-${index + 1}`,
@@ -23,25 +23,69 @@ export function randomizeTeams(state: GameState, teamCount: number): GameState {
     updatedAt: new Date().toISOString(),
   }));
 
-  shuffled.forEach((member, index) => {
+  const shuffledMembers = [...members].sort(() => Math.random() - 0.5);
+
+  if (spreadOrganizers) {
+    const organizers = shuffledMembers.filter((member) => organizerMemberIds.has(member.id));
+    const others = shuffledMembers.filter((member) => !organizerMemberIds.has(member.id));
+
+    organizers.forEach((member, index) => {
+      teams[index % safeTeamCount].memberIds.push(member.id);
+    });
+    others.forEach((member) => {
+      const target = [...teams].sort((left, right) => left.memberIds.length - right.memberIds.length)[0];
+      target.memberIds.push(member.id);
+    });
+    return teams;
+  }
+
+  shuffledMembers.forEach((member, index) => {
     teams[index % safeTeamCount].memberIds.push(member.id);
   });
 
+  return teams;
+}
+
+export function applyTeamDraft(state: GameState, teams: Team[]): GameState {
   const members = state.members.map((member) => {
     const team = teams.find((candidate) => candidate.memberIds.includes(member.id));
     return { ...member, currentTeamId: team?.id, updatedAt: new Date().toISOString() };
   });
 
-  return addEventLog(
+  const next = addEventLog(
     {
       ...state,
       members,
       teams,
       gameStatus: "playing",
     },
-    `${safeTeamCount}チームにランダム編成しました。`,
+    `${teams.length}チームにランダム編成しました。`,
     "team",
   );
+
+  return addNotification(next, "チーム編成", `${teams.length}チームにランダム編成しました。`, "system");
+}
+
+export function randomizeTeams(state: GameState, teamCount: number, spreadOrganizers = false): GameState {
+  const teams = buildRandomTeams(state.members, teamCount, spreadOrganizers);
+
+  const members = state.members.map((member) => {
+    const team = teams.find((candidate) => candidate.memberIds.includes(member.id));
+    return { ...member, currentTeamId: team?.id, updatedAt: new Date().toISOString() };
+  });
+
+  const next = addEventLog(
+    {
+      ...state,
+      members,
+      teams,
+      gameStatus: "playing",
+    },
+    `${teams.length}チームにランダム編成しました。`,
+    "team",
+  );
+
+  return addNotification(next, "チーム編成", `${teams.length}チームにランダム編成しました。`, "system");
 }
 
 export function addTeam(state: GameState, name: string, color = "#00bfd6"): GameState {

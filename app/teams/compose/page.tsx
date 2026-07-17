@@ -1,52 +1,24 @@
 "use client";
 
-import { useState } from "react";
-import { Card, Field, PrimaryButton, inputClass } from "@/components/Cards";
-import { TeamRow } from "@/components/Lists";
+import Link from "next/link";
+import { Card } from "@/components/Cards";
 import { Shell } from "@/components/Shell";
-import { randomizeTeams } from "@/lib/teamLogic";
-import { useGameState } from "@/lib/useGameState";
 
 export default function ComposePage() {
-  const { state, updateState } = useGameState();
-  const [teamCount, setTeamCount] = useState(4);
-
-  if (!state) return <Shell title="チーム編成"><p>読み込み中...</p></Shell>;
-
   return (
     <Shell title="チーム編成">
-      <div className="grid gap-4">
-        <Card>
-          <Field>
-            チーム数
-            <input
-              className={inputClass}
-              type="number"
-              min={2}
-              max={6}
-              value={teamCount}
-              onChange={(event) => setTeamCount(Number(event.target.value))}
-            />
-          </Field>
-          <div className="mt-3">
-            <PrimaryButton onClick={() => updateState((current) => randomizeTeams(current, teamCount))}>
-              ランダム編成する
-            </PrimaryButton>
-          </div>
-          <p className="mt-3 text-sm text-slate-400">人数がなるべく均等になるように編成します。</p>
-        </Card>
-
-        <Card>
-          <h2 className="mb-3 text-lg font-black">現在の編成</h2>
-          <div className="grid gap-2">
-            {state.teams.length === 0 ? (
-              <p className="text-sm text-slate-400">まだ編成されていません。</p>
-            ) : (
-              state.teams.map((team) => <TeamRow key={team.id} team={team} state={state} />)
-            )}
-          </div>
-        </Card>
-      </div>
+      <Card>
+        <h2 className="text-lg font-black text-ink">チーム編成は管理者画面で行います</h2>
+        <p className="mt-2 text-sm leading-6 text-slate-400">
+          参加者側から誤ってチームを変更しないよう、この画面では編成操作をできません。
+        </p>
+        <Link
+          href="/admin"
+          className="mt-4 block rounded-md bg-lagoon px-4 py-3 text-center text-sm font-black text-ink shadow-[0_8px_22px_rgba(0,191,214,0.18)]"
+        >
+          管理者画面へ
+        </Link>
+      </Card>
     </Shell>
   );
 }

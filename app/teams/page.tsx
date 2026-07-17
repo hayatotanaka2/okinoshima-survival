@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { Card, Stat } from "@/components/Cards";
 import { Shell } from "@/components/Shell";
 import { calculateTeamCoin } from "@/lib/teamLogic";
@@ -12,11 +11,6 @@ export default function TeamsPage() {
 
   return (
     <Shell title="チーム">
-      <div className="mb-4">
-        <Link href="/teams/compose" className="block rounded-md bg-lagoon px-4 py-3 text-center text-sm font-black text-ink shadow-[0_8px_22px_rgba(0,191,214,0.18)]">
-          チーム編成へ
-        </Link>
-      </div>
       <div className="grid gap-4">
         {state.teams.length === 0 && <Card>まだチームがありません。</Card>}
         {state.teams.map((team) => {

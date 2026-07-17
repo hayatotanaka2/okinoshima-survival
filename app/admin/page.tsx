@@ -11,16 +11,18 @@ import { addEventLog, addNotification, uid } from "@/lib/gameLogic";
 import { assignItemToMember } from "@/lib/itemLogic";
 import { deleteMember, updateMemberName } from "@/lib/memberLogic";
 import { approveMissionSubmission, completeMissionForTeam, createMission, deleteMission, rejectMissionSubmission, setMissionStatus, updateMission } from "@/lib/missionLogic";
-import { addTeam, deleteTeam, moveMemberToTeam, randomizeTeams, updateTeam } from "@/lib/teamLogic";
+import { addTeam, applyTeamDraft, buildRandomTeams, calculateTeamCoin, deleteTeam, moveMemberToTeam, updateTeam } from "@/lib/teamLogic";
 import { isSupabaseConfigured } from "@/lib/supabaseClient";
 import { useGameState } from "@/lib/useGameState";
-import type { MissionDifficulty, MissionTargetType, Treasure } from "@/lib/types";
+import type { GameState, MissionDifficulty, MissionTargetType, Team, Treasure } from "@/lib/types";
 
 export default function AdminPage() {
   const { state, updateState, reset } = useGameState();
   const [passcode, setPasscode] = useState("");
   const [authed, setAuthed] = useState(false);
   const [teamCount, setTeamCount] = useState(4);
+  const [spreadOrganizers, setSpreadOrganizers] = useState(true);
+  const [draftTeams, setDraftTeams] = useState<Team[]>([]);
   const [memberName, setMemberName] = useState("");
   const [editMemberId, setEditMemberId] = useState("");
   const [editMemberName, setEditMemberName] = useState("");
@@ -182,6 +184,30 @@ export default function AdminPage() {
     setNoticeBody("");
   }
 
+  function generateTeamDraft() {
+    if (!state) return;
+    setDraftTeams(buildRandomTeams(state.members, teamCount, spreadOrganizers));
+  }
+
+  function moveDraftMember(memberId: string, nextTeamId: string) {
+    setDraftTeams((current) =>
+      current.map((team) => ({
+        ...team,
+        memberIds:
+          team.id === nextTeamId
+            ? Array.from(new Set([...team.memberIds, memberId]))
+            : team.memberIds.filter((id) => id !== memberId),
+        updatedAt: new Date().toISOString(),
+      })),
+    );
+  }
+
+  function confirmTeamDraft() {
+    if (draftTeams.length === 0) return;
+    updateState((current) => applyTeamDraft(current, draftTeams));
+    setDraftTeams([]);
+  }
+
   return (
     <Shell title="管理者">
       <div className="grid gap-4">
@@ -247,7 +273,28 @@ export default function AdminPage() {
               チーム数
               <input className={inputClass} type="number" min={2} max={6} value={teamCount} onChange={(event) => setTeamCount(Number(event.target.value))} />
             </Field>
-            <PrimaryButton onClick={() => updateState((current) => randomizeTeams(current, teamCount))}>ランダム再編成</PrimaryButton>
+            <label className="flex items-start gap-3 rounded-md border border-reef/15 bg-white/80 p-3 text-sm font-bold text-ink">
+              <input
+                type="checkbox"
+                className="mt-1 h-5 w-5 accent-lagoon"
+                checked={spreadOrganizers}
+                onChange={(event) => setSpreadOrganizers(event.target.checked)}
+              />
+              <span>
+                幹事をできるだけばらけさせる
+                <span className="mt-1 block text-xs font-bold text-slate-400">対象: はやと、まさこ、あやなん、こひ</span>
+              </span>
+            </label>
+            <PrimaryButton onClick={generateTeamDraft}>ランダム編成を作成</PrimaryButton>
+            {draftTeams.length > 0 && (
+              <TeamDraftPreview
+                state={state}
+                teams={draftTeams}
+                onMoveMember={moveDraftMember}
+                onConfirm={confirmTeamDraft}
+                onCancel={() => setDraftTeams([])}
+              />
+            )}
           </div>
         </AdminCard>
 
@@ -466,6 +513,61 @@ export default function AdminPage() {
         </AdminCard>
       </div>
     </Shell>
+  );
+}
+
+function TeamDraftPreview({
+  state,
+  teams,
+  onMoveMember,
+  onConfirm,
+  onCancel,
+}: {
+  state: GameState;
+  teams: Team[];
+  onMoveMember: (memberId: string, teamId: string) => void;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
+  return (
+    <div className="mt-2 grid gap-3 rounded-md border border-reef/15 bg-cyan-50/70 p-3">
+      <div>
+        <h3 className="text-base font-black text-ink">編成確認</h3>
+        <p className="mt-1 text-sm text-slate-400">必要ならメンバーごとの移動先を変えてから確定してください。確定時に全体へ同期され、ログと通知に残ります。</p>
+      </div>
+      <div className="grid gap-3">
+        {teams.map((team) => {
+          const members = state.members.filter((member) => team.memberIds.includes(member.id));
+          return (
+            <div key={team.id} className="rounded-md border border-white bg-white/90 p-3 shadow-sm">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="h-4 w-4 rounded-sm" style={{ background: team.color }} />
+                  <p className="font-black text-ink">{team.name}</p>
+                </div>
+                <p className="text-xs font-black text-lagoon">{members.length}人 / {calculateTeamCoin(team, state.members)}沖</p>
+              </div>
+              <div className="mt-3 grid gap-2">
+                {members.map((member) => (
+                  <div key={member.id} className="grid gap-1 rounded-md bg-slate-50 p-2">
+                    <p className="text-sm font-black text-ink">{member.name}</p>
+                    <select className={inputClass} value={team.id} onChange={(event) => onMoveMember(member.id, event.target.value)}>
+                      {teams.map((candidate) => (
+                        <option key={candidate.id} value={candidate.id}>{candidate.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        <PrimaryButton onClick={onConfirm}>この編成で確定</PrimaryButton>
+        <DangerButton onClick={onCancel}>破棄</DangerButton>
+      </div>
+    </div>
   );
 }
 
