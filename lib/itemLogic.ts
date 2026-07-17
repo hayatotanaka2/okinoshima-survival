@@ -1,4 +1,5 @@
 import { addEventLog, addNotification } from "./gameLogic";
+import { getVisibleItemName } from "./itemVisibility";
 import type { GameState } from "./types";
 
 export function assignItemToMember(state: GameState, itemId: string, memberId: string): GameState {
@@ -25,7 +26,7 @@ export function assignItemToMember(state: GameState, itemId: string, memberId: s
       : candidate,
   );
 
-  return addEventLog({ ...state, items, members }, `${member.name}が「${item.name}」を獲得しました。`, "item");
+  return addEventLog({ ...state, items, members }, `${member.name}が「${getVisibleItemName(item)}」を獲得しました。`, "item");
 }
 
 export function assignItemToTeam(state: GameState, itemId: string, teamId: string): GameState {
@@ -46,7 +47,7 @@ export function assignItemToTeam(state: GameState, itemId: string, teamId: strin
       : candidate,
   );
 
-  return addEventLog({ ...state, items }, `${team.name}が「${item.name}」を獲得しました。`, "item");
+  return addEventLog({ ...state, items }, `${team.name}が「${getVisibleItemName(item)}」を獲得しました。`, "item");
 }
 
 export function useItem(state: GameState, itemId: string, actorName: string): GameState {
@@ -63,6 +64,6 @@ export function useItem(state: GameState, itemId: string, actorName: string): Ga
       : candidate,
   );
 
-  const message = `${actorName}が「${item.name}」を使用しました。`;
+  const message = `${actorName}が「${getVisibleItemName(item)}」を使用しました。`;
   return addNotification(addEventLog({ ...state, items }, message, "item"), "アイテム使用", message, "item");
 }

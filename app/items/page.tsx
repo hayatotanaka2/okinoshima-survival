@@ -2,6 +2,7 @@
 
 import { Card, Field, PrimaryButton, inputClass } from "@/components/Cards";
 import { Shell } from "@/components/Shell";
+import { getVisibleItemDescription, getVisibleItemName } from "@/lib/itemVisibility";
 import { useItem } from "@/lib/itemLogic";
 import { useGameState } from "@/lib/useGameState";
 import { useSelectedMember } from "@/lib/useSelectedMember";
@@ -55,12 +56,12 @@ export default function ItemsPage() {
               )}
               <div className={`relative ${used ? "grayscale" : ""}`}>
                 <div className="flex items-start justify-between gap-3">
-                  <h2 className="text-lg font-black">{item.name}</h2>
+                  <h2 className="text-lg font-black">{getVisibleItemName(item, actor?.id)}</h2>
                   <span className={`rounded-md px-2 py-1 text-xs font-bold ${used ? "bg-slate-200 text-slate-500" : "bg-violet-50 text-reef"}`}>
                     {used ? "使用不可" : "所持中"}
                   </span>
                 </div>
-                <p className="mt-2 text-sm leading-6 text-slate-300">{item.description}</p>
+                <p className="mt-2 text-sm leading-6 text-slate-300">{getVisibleItemDescription(item, actor?.id)}</p>
                 <p className="mt-3 text-sm text-slate-400">所有者: {ownerMember?.name ?? ownerTeam?.name ?? "未取得"}</p>
                 <div className="mt-3">
                   <PrimaryButton

@@ -95,6 +95,8 @@ type Mission = {
 };
 ```
 
+`rewardItem` には秘匿カード用に `isSecret` と `publicName` を持てます。秘匿カードは報酬作成時の本名を保存しつつ、未所持者には `publicName` だけを表示します。
+
 ## 6. Item
 
 ```ts
@@ -118,6 +120,8 @@ type Item = {
   description: string;
   type: ItemType;
   value: number;
+  isSecret?: boolean;
+  publicName?: string;
   ownerType: OwnerType;
   ownerMemberId?: string;
   ownerTeamId?: string;
@@ -127,6 +131,8 @@ type Item = {
   updatedAt: string;
 };
 ```
+
+`isSecret` が true のアイテムは、所有者本人以外には `publicName` だけを表示し、説明文も伏せます。ミッション報酬でチーム全員へ配布する場合も、データ上は各メンバーに1枚ずつ個人所有カードを作成します。
 
 `acquiredTeamId` は、その物資やカードを獲得・購入した時点の所属チームを表します。
 

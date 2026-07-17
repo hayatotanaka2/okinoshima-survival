@@ -35,16 +35,21 @@ export function normalizeGameState(state: GameState): GameState {
     memberIds: team.memberIds.filter((memberId) => validMemberIds.has(memberId)),
   }));
   const items = (state.items ?? []).map((item) => {
+    const normalizedItem = {
+      ...item,
+      isSecret: item.isSecret ?? false,
+      publicName: item.publicName,
+    };
     if (item.ownerMemberId && !validMemberIds.has(item.ownerMemberId)) {
       return {
-        ...item,
+        ...normalizedItem,
         ownerType: "none" as const,
         ownerMemberId: undefined,
         ownerTeamId: undefined,
         status: "available" as const,
       };
     }
-    return item;
+    return normalizedItem;
   });
   const missions = (state.missions ?? []).map((mission) => ({
     ...mission,
@@ -55,7 +60,23 @@ export function normalizeGameState(state: GameState): GameState {
     requiresCode: mission.requiresCode ?? false,
     rewardKind: mission.rewardKind ?? "coin",
     rewardMode: mission.rewardMode ?? "same",
-    rankingRewards: mission.rankingRewards ?? [],
+    rewardItem: mission.rewardItem
+      ? {
+          ...mission.rewardItem,
+          isSecret: mission.rewardItem.isSecret ?? false,
+          publicName: mission.rewardItem.publicName,
+        }
+      : undefined,
+    rankingRewards: (mission.rankingRewards ?? []).map((reward) => ({
+      ...reward,
+      rewardItem: reward.rewardItem
+        ? {
+            ...reward.rewardItem,
+            isSecret: reward.rewardItem.isSecret ?? false,
+            publicName: reward.rewardItem.publicName,
+          }
+        : undefined,
+    })),
     completedTeamRecords:
       mission.completedTeamRecords?.length
         ? mission.completedTeamRecords

@@ -1,5 +1,6 @@
 import { distributeRewardToTeam } from "./coinLogic";
 import { addEventLog, addNotification, uid } from "./gameLogic";
+import { getVisibleRewardName } from "./itemVisibility";
 import type {
   GameState,
   Item,
@@ -188,7 +189,7 @@ function completeMissionForTeamWithReward(state: GameState, mission: Mission, te
 
 function rewardSummary(mission: Mission, team: Team): string {
   if ((mission.rewardKind ?? "coin") === "item" && mission.rewardItem) {
-    return `各メンバーに「${mission.rewardItem.name}」を1枚配布しました。`;
+    return `各メンバーに「${getVisibleRewardName(mission.rewardItem)}」を1枚配布しました。`;
   }
   const rewardPerMember = team.memberIds.length > 0 ? Math.floor(mission.rewardCoin / team.memberIds.length) : 0;
   return `各メンバーに${rewardPerMember}沖コインを配布しました。`;
@@ -209,6 +210,8 @@ function distributeItemRewardToTeam(state: GameState, mission: Mission, team: Te
     description: reward.description || `ミッション「${mission.title}」の報酬です。`,
     type: reward.type,
     value: reward.value,
+    isSecret: reward.isSecret ?? false,
+    publicName: reward.publicName,
     ownerType: "member",
     ownerMemberId: memberId,
     acquiredTeamId: team.id,

@@ -2,6 +2,7 @@
 
 import { Card, Stat } from "@/components/Cards";
 import { Shell } from "@/components/Shell";
+import { getPublicItemName, getVisibleItemName } from "@/lib/itemVisibility";
 import { calculateTeamCoin } from "@/lib/teamLogic";
 import { useGameState } from "@/lib/useGameState";
 import { useSelectedMember } from "@/lib/useSelectedMember";
@@ -50,6 +51,7 @@ export default function TeamsPage() {
               (record) => record.teamId === team.id && record.completedAt >= team.createdAt,
             ),
           );
+          const itemLabels = getTeamItemLabels(items, selectedMember?.id);
           return (
             <Card key={team.id}>
               <div className="flex items-center gap-2">
@@ -64,7 +66,7 @@ export default function TeamsPage() {
                 <p className="text-sm font-black text-lagoon">メンバー</p>
                 <p className="mt-1 text-sm text-slate-200">{members.map((member) => member.name).join("、") || "未設定"}</p>
               </div>
-              <p className="mt-4 text-sm text-slate-300">所属メンバーが現在チームで共通獲得した物資・カード: {items.map((item) => item.name).join("、") || "なし"}</p>
+              <p className="mt-4 text-sm text-slate-300">所属メンバーが現在チームで共通獲得した物資・カード: {itemLabels.join("、") || "なし"}</p>
               <p className="mt-2 text-sm text-slate-300">現在チームで達成したミッション: {completed.map((mission) => mission.title).join("、") || "なし"}</p>
             </Card>
           );
@@ -72,4 +74,17 @@ export default function TeamsPage() {
       </div>
     </Shell>
   );
+}
+
+function getTeamItemLabels(items: Parameters<typeof getVisibleItemName>[0][], viewerMemberId?: string): string[] {
+  const grouped = new Map<string, typeof items>();
+  items.forEach((item) => {
+    const key = item.isSecret ? `${getPublicItemName(item)}:${item.name}` : item.name;
+    grouped.set(key, [...(grouped.get(key) ?? []), item]);
+  });
+
+  return Array.from(grouped.values()).map((group) => {
+    const viewerItem = group.find((item) => item.ownerMemberId === viewerMemberId);
+    return getVisibleItemName(viewerItem ?? group[0], viewerMemberId);
+  });
 }

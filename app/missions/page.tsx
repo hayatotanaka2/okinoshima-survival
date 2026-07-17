@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { Card, Field, PrimaryButton, inputClass } from "@/components/Cards";
 import { Shell } from "@/components/Shell";
+import { getVisibleRewardName } from "@/lib/itemVisibility";
 import { claimMissionTreasureCode, createMissionSubmission, isMissionCompletedByTeam } from "@/lib/missionLogic";
 import { uploadMissionPhotos } from "@/lib/photoStorage";
 import { useGameState } from "@/lib/useGameState";
@@ -86,6 +87,10 @@ export default function MissionsPage() {
           const canAct = mission.status === "active" && currentTeam && selectedMember && !completedByMyTeam;
           const requiresPhoto = mission.requiresPhoto ?? true;
           const requiresCode = mission.requiresCode ?? false;
+          const revealReward =
+            completedByMyTeam &&
+            !!selectedMember &&
+            state.items.some((item) => item.ownerMemberId === selectedMember.id && item.name === mission.rewardItem?.name);
           return (
             <Card key={mission.id}>
               <div className="flex items-start justify-between gap-3">
@@ -100,7 +105,7 @@ export default function MissionsPage() {
               <div className="mt-2 flex flex-wrap gap-2 text-xs font-black">
                 <span className="rounded-md bg-cyan-50 px-2 py-1 text-ink">{categoryLabel[mission.category ?? "single"]}</span>
                 <span className="rounded-md bg-violet-50 px-2 py-1 text-reef">{mission.requirement === "required" ? "必須" : "任意"}</span>
-                <span className="rounded-md bg-yellow-50 px-2 py-1 text-ink">{(mission.rewardKind ?? "coin") === "item" ? mission.rewardItem?.name ?? "カード報酬" : `${mission.rewardCoin}沖`}</span>
+                <span className="rounded-md bg-yellow-50 px-2 py-1 text-ink">{(mission.rewardKind ?? "coin") === "item" ? getVisibleRewardName(mission.rewardItem, revealReward) : `${mission.rewardCoin}沖`}</span>
               </div>
               <p className="mt-2 text-sm leading-6 text-slate-300">{mission.description}</p>
               <div className="mt-3 grid gap-2 text-center text-sm">

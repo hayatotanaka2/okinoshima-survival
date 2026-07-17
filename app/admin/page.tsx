@@ -46,10 +46,12 @@ export default function AdminPage() {
   const [missionRewardMode, setMissionRewardMode] = useState<MissionRewardMode>("same");
   const [missionRewardItemName, setMissionRewardItemName] = useState("");
   const [missionRewardItemDescription, setMissionRewardItemDescription] = useState("");
+  const [missionRewardItemSecret, setMissionRewardItemSecret] = useState(false);
+  const [missionRewardItemPublicName, setMissionRewardItemPublicName] = useState("");
   const [rankingRewards, setRankingRewards] = useState([
-    { rank: 1, rewardKind: "coin" as MissionRewardKind, rewardCoin: 1000, rewardItemName: "", rewardItemDescription: "" },
-    { rank: 2, rewardKind: "coin" as MissionRewardKind, rewardCoin: 600, rewardItemName: "", rewardItemDescription: "" },
-    { rank: 3, rewardKind: "coin" as MissionRewardKind, rewardCoin: 300, rewardItemName: "", rewardItemDescription: "" },
+    { rank: 1, rewardKind: "coin" as MissionRewardKind, rewardCoin: 1000, rewardItemName: "", rewardItemDescription: "", rewardItemSecret: false, rewardItemPublicName: "" },
+    { rank: 2, rewardKind: "coin" as MissionRewardKind, rewardCoin: 600, rewardItemName: "", rewardItemDescription: "", rewardItemSecret: false, rewardItemPublicName: "" },
+    { rank: 3, rewardKind: "coin" as MissionRewardKind, rewardCoin: 300, rewardItemName: "", rewardItemDescription: "", rewardItemSecret: false, rewardItemPublicName: "" },
   ]);
   const [editMissionId, setEditMissionId] = useState("");
   const [rankingMissionId, setRankingMissionId] = useState("");
@@ -166,6 +168,8 @@ export default function AdminPage() {
               description: missionRewardItemDescription,
               type: "privilege",
               value: 0,
+              isSecret: missionRewardItemSecret,
+              publicName: missionRewardItemSecret ? missionRewardItemPublicName.trim() || "秘匿カード" : undefined,
             }
           : undefined,
         rankingRewards: rankingRewards.map((reward) => ({
@@ -178,6 +182,8 @@ export default function AdminPage() {
                 description: reward.rewardItemDescription,
                 type: "privilege",
                 value: 0,
+                isSecret: reward.rewardItemSecret,
+                publicName: reward.rewardItemSecret ? reward.rewardItemPublicName.trim() || `${reward.rank}位カード` : undefined,
               }
             : undefined,
         })),
@@ -188,6 +194,8 @@ export default function AdminPage() {
     setMissionTreasureCode("");
     setMissionRewardItemName("");
     setMissionRewardItemDescription("");
+    setMissionRewardItemSecret(false);
+    setMissionRewardItemPublicName("");
   }
 
   function submitMissionEdit(event: FormEvent) {
@@ -213,6 +221,8 @@ export default function AdminPage() {
               description: missionRewardItemDescription,
               type: "privilege",
               value: 0,
+              isSecret: missionRewardItemSecret,
+              publicName: missionRewardItemSecret ? missionRewardItemPublicName.trim() || "秘匿カード" : undefined,
             }
           : undefined,
         rankingRewards: rankingRewards.map((reward) => ({
@@ -225,6 +235,8 @@ export default function AdminPage() {
                 description: reward.rewardItemDescription,
                 type: "privilege",
                 value: 0,
+                isSecret: reward.rewardItemSecret,
+                publicName: reward.rewardItemSecret ? reward.rewardItemPublicName.trim() || `${reward.rank}位カード` : undefined,
               }
             : undefined,
         })),
@@ -455,6 +467,8 @@ export default function AdminPage() {
                 rewardMode={missionRewardMode}
                 rewardItemName={missionRewardItemName}
                 rewardItemDescription={missionRewardItemDescription}
+                rewardItemSecret={missionRewardItemSecret}
+                rewardItemPublicName={missionRewardItemPublicName}
                 rankingRewards={rankingRewards}
                 setTitle={setMissionTitle}
                 setDescription={setMissionDescription}
@@ -470,6 +484,8 @@ export default function AdminPage() {
                 setRewardMode={setMissionRewardMode}
                 setRewardItemName={setMissionRewardItemName}
                 setRewardItemDescription={setMissionRewardItemDescription}
+                setRewardItemSecret={setMissionRewardItemSecret}
+                setRewardItemPublicName={setMissionRewardItemPublicName}
                 setRankingRewards={setRankingRewards}
               />
               <PrimaryButton type="submit" disabled={!missionTitle.trim() || (missionRewardKind === "item" && !missionRewardItemName.trim())}>作成して発令</PrimaryButton>
@@ -495,6 +511,8 @@ export default function AdminPage() {
                   setMissionRewardMode(mission?.rewardMode ?? "same");
                   setMissionRewardItemName(mission?.rewardItem?.name ?? "");
                   setMissionRewardItemDescription(mission?.rewardItem?.description ?? "");
+                  setMissionRewardItemSecret(mission?.rewardItem?.isSecret ?? false);
+                  setMissionRewardItemPublicName(mission?.rewardItem?.publicName ?? "");
                   if (mission?.rankingRewards?.length) {
                     setRankingRewards([1, 2, 3].map((rank) => {
                       const reward = mission.rankingRewards?.find((candidate) => candidate.rank === rank);
@@ -504,6 +522,8 @@ export default function AdminPage() {
                         rewardCoin: reward?.rewardCoin ?? 0,
                         rewardItemName: reward?.rewardItem?.name ?? "",
                         rewardItemDescription: reward?.rewardItem?.description ?? "",
+                        rewardItemSecret: reward?.rewardItem?.isSecret ?? false,
+                        rewardItemPublicName: reward?.rewardItem?.publicName ?? "",
                       };
                     }));
                   }
@@ -764,6 +784,8 @@ function MissionFields({
   rewardMode,
   rewardItemName,
   rewardItemDescription,
+  rewardItemSecret,
+  rewardItemPublicName,
   rankingRewards,
   setTitle,
   setDescription,
@@ -779,6 +801,8 @@ function MissionFields({
   setRewardMode,
   setRewardItemName,
   setRewardItemDescription,
+  setRewardItemSecret,
+  setRewardItemPublicName,
   setRankingRewards,
 }: {
   title: string;
@@ -795,7 +819,9 @@ function MissionFields({
   rewardMode: MissionRewardMode;
   rewardItemName: string;
   rewardItemDescription: string;
-  rankingRewards: Array<{ rank: number; rewardKind: MissionRewardKind; rewardCoin: number; rewardItemName: string; rewardItemDescription: string }>;
+  rewardItemSecret: boolean;
+  rewardItemPublicName: string;
+  rankingRewards: Array<{ rank: number; rewardKind: MissionRewardKind; rewardCoin: number; rewardItemName: string; rewardItemDescription: string; rewardItemSecret: boolean; rewardItemPublicName: string }>;
   setTitle: (value: string) => void;
   setDescription: (value: string) => void;
   setRewardCoin: (value: number) => void;
@@ -810,7 +836,9 @@ function MissionFields({
   setRewardMode: (value: MissionRewardMode) => void;
   setRewardItemName: (value: string) => void;
   setRewardItemDescription: (value: string) => void;
-  setRankingRewards: (value: Array<{ rank: number; rewardKind: MissionRewardKind; rewardCoin: number; rewardItemName: string; rewardItemDescription: string }>) => void;
+  setRewardItemSecret: (value: boolean) => void;
+  setRewardItemPublicName: (value: string) => void;
+  setRankingRewards: (value: Array<{ rank: number; rewardKind: MissionRewardKind; rewardCoin: number; rewardItemName: string; rewardItemDescription: string; rewardItemSecret: boolean; rewardItemPublicName: string }>) => void;
 }) {
   const forcedRequired = category === "emergency-treasure" || category === "emergency-battle";
   const codeRequired = requiresCode || category === "emergency-treasure";
@@ -888,6 +916,16 @@ function MissionFields({
             カード説明
             <textarea className={inputClass} value={rewardItemDescription} onChange={(event) => setRewardItemDescription(event.target.value)} />
           </Field>
+          <label className="flex items-center gap-2 text-sm font-bold text-ink">
+            <input type="checkbox" className="h-5 w-5 accent-ember" checked={rewardItemSecret} onChange={(event) => setRewardItemSecret(event.target.checked)} />
+            取得者本人以外にはカード内容を秘匿する
+          </label>
+          {rewardItemSecret && (
+            <Field>
+              未取得者向け表示名
+              <input className={inputClass} value={rewardItemPublicName} onChange={(event) => setRewardItemPublicName(event.target.value)} placeholder="宝箱Aカード" />
+            </Field>
+          )}
         </div>
       )}
       <input type="hidden" value={difficulty} onChange={(event) => setDifficulty(event.target.value as MissionDifficulty)} />
@@ -937,6 +975,26 @@ function MissionFields({
                       onChange={(event) => setRankingRewards(rankingRewards.map((current, currentIndex) => currentIndex === index ? { ...current, rewardItemDescription: event.target.value } : current))}
                     />
                   </Field>
+                  <label className="flex items-center gap-2 text-sm font-bold text-ink">
+                    <input
+                      type="checkbox"
+                      className="h-5 w-5 accent-ember"
+                      checked={reward.rewardItemSecret}
+                      onChange={(event) => setRankingRewards(rankingRewards.map((current, currentIndex) => currentIndex === index ? { ...current, rewardItemSecret: event.target.checked } : current))}
+                    />
+                    取得者本人以外にはカード内容を秘匿する
+                  </label>
+                  {reward.rewardItemSecret && (
+                    <Field>
+                      未取得者向け表示名
+                      <input
+                        className={inputClass}
+                        value={reward.rewardItemPublicName}
+                        onChange={(event) => setRankingRewards(rankingRewards.map((current, currentIndex) => currentIndex === index ? { ...current, rewardItemPublicName: event.target.value } : current))}
+                        placeholder={`${reward.rank}位カード`}
+                      />
+                    </Field>
+                  )}
                 </>
               )}
             </div>

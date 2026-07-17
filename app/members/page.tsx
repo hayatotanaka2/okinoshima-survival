@@ -2,10 +2,13 @@
 
 import { Card, Stat } from "@/components/Cards";
 import { Shell } from "@/components/Shell";
+import { getVisibleItemName } from "@/lib/itemVisibility";
 import { useGameState } from "@/lib/useGameState";
+import { useSelectedMember } from "@/lib/useSelectedMember";
 
 export default function MembersPage() {
   const { state } = useGameState();
+  const { selectedMember } = useSelectedMember(state);
   if (!state) return <Shell title="メンバー"><p>読み込み中...</p></Shell>;
 
   return (
@@ -28,7 +31,7 @@ export default function MembersPage() {
                 <Stat label="累計消費" value={`${member.totalSpentCoin}`} />
               </div>
               <p className="mt-3 text-sm text-slate-300">
-                所持物資: {items.length ? items.map((item) => item.name).join("、") : "なし"}
+                所持物資: {items.length ? items.map((item) => getVisibleItemName(item, selectedMember?.id)).join("、") : "なし"}
               </p>
             </Card>
           );

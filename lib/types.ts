@@ -39,6 +39,8 @@ export type MissionItemReward = {
   description: string;
   type: ItemType;
   value: number;
+  isSecret?: boolean;
+  publicName?: string;
 };
 
 export type MissionRankingReward = {
@@ -100,6 +102,8 @@ export type Item = {
   description: string;
   type: ItemType;
   value: number;
+  isSecret?: boolean;
+  publicName?: string;
   ownerType: OwnerType;
   ownerMemberId?: string;
   ownerTeamId?: string;
