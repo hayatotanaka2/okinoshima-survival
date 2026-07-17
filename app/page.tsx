@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Card, Stat } from "@/components/Cards";
+import { Card } from "@/components/Cards";
 import { EventLogList, NotificationList } from "@/components/Lists";
 import { PlayerSelector } from "@/components/PlayerSelector";
 import { Shell } from "@/components/Shell";
 import { isPushSupported, registerServiceWorker, requestNotificationPermission } from "@/lib/push";
 import { useGameState } from "@/lib/useGameState";
+import { useSelectedMember } from "@/lib/useSelectedMember";
 
 const quickLinks = [
   ["/members", "メンバー"],
@@ -16,11 +17,13 @@ const quickLinks = [
   ["/items", "物資"],
   ["/auction", "オークション"],
   ["/morale", "士気掲示板"],
+  ["/submissions", "写真投稿"],
   ["/admin", "管理者"],
 ];
 
 export default function HomePage() {
   const { state } = useGameState();
+  const { selectedMember } = useSelectedMember(state);
 
   if (!state) return <Shell title="沖ノ島サバイバル"><p>読み込み中...</p></Shell>;
 
@@ -37,13 +40,12 @@ export default function HomePage() {
           </p>
         </section>
 
-        <div className="grid grid-cols-3 gap-2">
-          <Stat label="状態" value={state.gameStatus} />
-          <Stat label="参加者" value={`${state.members.length}人`} />
-          <Stat label="チーム" value={`${state.teams.length}`} />
-        </div>
+        <Card>
+          <h3 className="mb-3 text-lg font-black">最新通知</h3>
+          <NotificationList notifications={state.notifications} limit={3} />
+        </Card>
 
-        <PlayerSelector state={state} />
+        {!selectedMember && <PlayerSelector state={state} />}
 
         <div className="grid grid-cols-2 gap-2">
           {quickLinks.map(([href, label]) => (
@@ -54,38 +56,11 @@ export default function HomePage() {
         </div>
 
         <Card>
-          <h3 className="mb-3 text-lg font-black">最新通知</h3>
-          <NotificationList notifications={state.notifications} />
-        </Card>
-
-        <Card>
-          <h3 className="mb-3 text-lg font-black">写真投稿</h3>
-          <div className="grid gap-3">
-            {state.submissions.length === 0 && <p className="text-sm text-slate-400">まだ投稿がありません。</p>}
-            {state.submissions.slice(0, 8).map((submission) => {
-              const mission = state.missions.find((candidate) => candidate.id === submission.missionId);
-              const team = state.teams.find((candidate) => candidate.id === submission.teamId);
-              const imageUrls = submission.imageUrls ?? [submission.imageUrl].filter(Boolean);
-              return (
-                <div key={submission.id} className="rounded-md border border-reef/10 bg-white/80 p-2">
-                  <p className="text-sm font-black text-ink">{mission?.title ?? "ミッション"} / {team?.name ?? "チーム"}</p>
-                  <div className="mt-2 grid grid-cols-3 gap-2">
-                    {imageUrls.slice(0, 6).map((url) => (
-                      <img key={url} src={url} alt="" className="aspect-square w-full rounded-md object-cover" />
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </Card>
-
-        <PwaNotice />
-
-        <Card>
           <h3 className="mb-3 text-lg font-black">イベントログ</h3>
           <EventLogList logs={state.eventLogs} />
         </Card>
+
+        <PwaNotice />
       </div>
     </Shell>
   );

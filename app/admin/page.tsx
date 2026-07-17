@@ -72,6 +72,8 @@ export default function AdminPage() {
   const [treasureCode, setTreasureCode] = useState("");
   const [treasureTitle, setTreasureTitle] = useState("");
   const [treasureCoin, setTreasureCoin] = useState(300);
+  const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
+  const [resetPasscode, setResetPasscode] = useState("");
 
   if (!state) return <Shell title="管理者"><p>読み込み中...</p></Shell>;
 
@@ -680,7 +682,37 @@ export default function AdminPage() {
         </AdminCard>
 
         <AdminCard title="ゲームリセット">
-          <PrimaryButton onClick={reset}>初期状態に戻す</PrimaryButton>
+          {!resetConfirmOpen ? (
+            <PrimaryButton onClick={() => setResetConfirmOpen(true)}>初期状態に戻す</PrimaryButton>
+          ) : (
+            <div className="grid gap-3 rounded-md border border-ember/20 bg-white/80 p-3">
+              <p className="text-sm font-black text-ember">リセットするには管理者パスコードを再入力してください。</p>
+              <Field>
+                管理者パスコード
+                <input className={inputClass} type="password" value={resetPasscode} onChange={(event) => setResetPasscode(event.target.value)} />
+              </Field>
+              <div className="grid grid-cols-2 gap-2">
+                <DangerButton
+                  disabled={resetPasscode !== "admin123"}
+                  onClick={() => {
+                    reset();
+                    setResetPasscode("");
+                    setResetConfirmOpen(false);
+                  }}
+                >
+                  リセット実行
+                </DangerButton>
+                <PrimaryButton
+                  onClick={() => {
+                    setResetPasscode("");
+                    setResetConfirmOpen(false);
+                  }}
+                >
+                  キャンセル
+                </PrimaryButton>
+              </div>
+            </div>
+          )}
           <p className="mt-2 text-sm text-slate-400">Supabaseと端末キャッシュのゲーム状態を初期化します。</p>
         </AdminCard>
       </div>

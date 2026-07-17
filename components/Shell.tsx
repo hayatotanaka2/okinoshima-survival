@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { HeaderPlayerButton } from "./HeaderPlayerButton";
 
 const navItems = [
   { href: "/", label: "ホーム", icon: "⌂" },
@@ -22,6 +23,7 @@ export function Shell({ children, title }: { children: ReactNode; title?: string
             <p className="text-xs font-black text-reef">OKINOSHIMA SURVIVAL</p>
             <h1 className="text-xl font-black tracking-normal text-ink">{title ?? "沖ノ島サバイバル"}</h1>
           </div>
+          <HeaderPlayerButton />
         </div>
       </header>
       <main className="px-4 py-4">{children}</main>
