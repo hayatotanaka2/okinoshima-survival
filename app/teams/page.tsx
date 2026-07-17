@@ -29,9 +29,8 @@ export default function TeamsPage() {
                 <span className="h-4 w-4 rounded-sm" style={{ background: team.color }} />
                 <h2 className="text-xl font-black">{team.name}</h2>
               </div>
-              <div className="mt-3 grid grid-cols-3 gap-2">
+              <div className="mt-3 grid grid-cols-2 gap-2">
                 <Stat label="人数" value={`${members.length}`} />
-                <Stat label="ポイント" value={team.point} />
                 <Stat label="合計沖" value={calculateTeamCoin(team, state.members)} />
               </div>
               <div className="mt-4">

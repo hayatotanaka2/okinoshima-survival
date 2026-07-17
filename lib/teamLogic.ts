@@ -10,13 +10,6 @@ export function calculateTeamCoin(team: Team, members: Member[]): number {
   }, 0);
 }
 
-export function calculateRanking(state: GameState): Team[] {
-  return [...state.teams].sort((a, b) => {
-    if (b.point !== a.point) return b.point - a.point;
-    return calculateTeamCoin(b, state.members) - calculateTeamCoin(a, state.members);
-  });
-}
-
 export function randomizeTeams(state: GameState, teamCount: number): GameState {
   const safeTeamCount = Math.max(2, Math.min(teamCount, 6));
   const shuffled = [...state.members].sort(() => Math.random() - 0.5);
@@ -25,7 +18,6 @@ export function randomizeTeams(state: GameState, teamCount: number): GameState {
     id: `team-${index + 1}`,
     name: teamNames[index] ?? `チーム${index + 1}`,
     color: teamColors[index] ?? "#19b7a6",
-    point: 0,
     memberIds: [],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -57,7 +49,6 @@ export function addTeam(state: GameState, name: string, color = "#19b7a6"): Game
     id: uid("team"),
     name,
     color,
-    point: 0,
     memberIds: [],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),

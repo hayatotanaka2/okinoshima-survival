@@ -46,19 +46,18 @@ export const seedMembers: Member[] = names.map((name, index) => ({
 }));
 
 export const seedMissions: Mission[] = [
-  ["mission-1", "海の生物を3種類発見する", "写真か口頭説明で幹事に報告する。", 80, 600, "normal"],
-  ["mission-2", "一番綺麗な貝を拾う", "各チーム1つ提出。幹事の独断と偏見で判定。", 60, 400, "easy"],
-  ["mission-3", "流木で武器っぽいものを作る", "安全な範囲で作り、写真を撮る。", 100, 800, "normal"],
-  ["mission-4", "全員で遭難写真を撮る", "チーム全員が写った遭難感のある写真を撮る。", 120, 900, "hard"],
-  ["mission-5", "島を横断する", "指定地点までチームで移動する。", 150, 1200, "hard"],
-  ["mission-6", "海水で顔を洗う", "代表者1名で達成可能。", 40, 200, "easy"],
-  ["mission-7", "他チームと物資交換する", "交換成立を幹事に報告する。", 90, 700, "normal"],
-  ["mission-8", "サンセット写真を撮る", "夕方限定。最も映えたチームに追加評価。", 150, 1000, "legend"],
-].map(([id, title, description, rewardPoint, rewardCoin, difficulty]) => ({
+  ["mission-1", "海の生物を3種類発見する", "写真か口頭説明で幹事に報告する。", 600, "normal"],
+  ["mission-2", "一番綺麗な貝を拾う", "各チーム1つ提出。幹事の独断と偏見で判定。", 400, "easy"],
+  ["mission-3", "流木で武器っぽいものを作る", "安全な範囲で作り、写真を撮る。", 800, "normal"],
+  ["mission-4", "全員で遭難写真を撮る", "チーム全員が写った遭難感のある写真を撮る。", 900, "hard"],
+  ["mission-5", "島を横断する", "指定地点までチームで移動する。", 1200, "hard"],
+  ["mission-6", "海水で顔を洗う", "代表者1名で達成可能。", 200, "easy"],
+  ["mission-7", "他チームと物資交換する", "交換成立を幹事に報告する。", 700, "normal"],
+  ["mission-8", "サンセット写真を撮る", "夕方限定。最も映えたチームに追加評価。", 1000, "legend"],
+].map(([id, title, description, rewardCoin, difficulty]) => ({
   id: String(id),
   title: String(title),
   description: String(description),
-  rewardPoint: Number(rewardPoint),
   rewardCoin: Number(rewardCoin),
   difficulty: difficulty as Mission["difficulty"],
   status: "draft",

@@ -60,7 +60,6 @@ type Team = {
   id: string;
   name: string;
   color: string;
-  point: number;
   memberIds: string[];
   createdAt: string;
   updatedAt: string;
@@ -80,7 +79,6 @@ type Mission = {
   id: string;
   title: string;
   description: string;
-  rewardPoint: number;
   rewardCoin: number;
   difficulty: MissionDifficulty;
   status: MissionStatus;

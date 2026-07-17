@@ -2,33 +2,18 @@ import { calculateTeamCoin } from "@/lib/teamLogic";
 import type { AppNotification, EventLog, GameState, Team } from "@/lib/types";
 import { Card } from "./Cards";
 
-export function RankingList({ state }: { state: GameState }) {
-  const ranked = [...state.teams].sort((a, b) => {
-    if (b.point !== a.point) return b.point - a.point;
-    return calculateTeamCoin(b, state.members) - calculateTeamCoin(a, state.members);
-  });
-
-  return (
-    <div className="grid gap-2">
-      {ranked.map((team, index) => (
-        <TeamRow key={team.id} team={team} state={state} prefix={`${index + 1}位`} />
-      ))}
-    </div>
-  );
-}
-
-export function TeamRow({ team, state, prefix }: { team: Team; state: GameState; prefix?: string }) {
+export function TeamRow({ team, state }: { team: Team; state: GameState }) {
   return (
     <div className="rounded-md border border-white/10 bg-slate-950/45 p-3">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <span className="h-3 w-3 rounded-sm" style={{ background: team.color }} />
-          <p className="font-black">{prefix ? `${prefix} ${team.name}` : team.name}</p>
+          <p className="font-black">{team.name}</p>
         </div>
         <p className="text-sm font-bold text-lagoon">{calculateTeamCoin(team, state.members)}沖</p>
       </div>
       <p className="mt-1 text-xs text-slate-400">
-        {team.memberIds.length}人 / {team.point}pt
+        {team.memberIds.length}人
       </p>
     </div>
   );

@@ -29,9 +29,8 @@ export default function MissionsPage() {
                 </span>
               </div>
               <p className="mt-2 text-sm leading-6 text-slate-300">{mission.description}</p>
-              <div className="mt-3 grid grid-cols-3 gap-2 text-center text-sm">
+              <div className="mt-3 grid grid-cols-2 gap-2 text-center text-sm">
                 <p className="rounded-md bg-slate-950/50 p-2">{mission.difficulty}</p>
-                <p className="rounded-md bg-slate-950/50 p-2">{mission.rewardPoint}pt</p>
                 <p className="rounded-md bg-slate-950/50 p-2">{mission.rewardCoin}沖</p>
               </div>
               <p className="mt-3 text-sm text-slate-400">

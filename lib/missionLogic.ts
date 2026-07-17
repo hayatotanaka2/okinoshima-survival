@@ -5,7 +5,6 @@ import type { GameState, Mission, MissionDifficulty, MissionStatus, MissionSubmi
 export type MissionInput = {
   title: string;
   description: string;
-  rewardPoint: number;
   rewardCoin: number;
   difficulty: MissionDifficulty;
   targetType: MissionTargetType;
@@ -16,7 +15,6 @@ export function createMission(state: GameState, input: MissionInput): GameState 
     id: uid("mission"),
     title: input.title.trim(),
     description: input.description.trim(),
-    rewardPoint: input.rewardPoint,
     rewardCoin: input.rewardCoin,
     difficulty: input.difficulty,
     status: "draft",
@@ -41,7 +39,6 @@ export function updateMission(state: GameState, missionId: string, input: Missio
           ...candidate,
           title: input.title.trim(),
           description: input.description.trim(),
-          rewardPoint: input.rewardPoint,
           rewardCoin: input.rewardCoin,
           difficulty: input.difficulty,
           targetType: input.targetType,
@@ -93,13 +90,7 @@ export function completeMissionForTeam(state: GameState, missionId: string, team
       : candidate,
   );
 
-  const teams = state.teams.map((candidate) =>
-    candidate.id === teamId
-      ? { ...candidate, point: candidate.point + mission.rewardPoint, updatedAt: new Date().toISOString() }
-      : candidate,
-  );
-
-  let next = distributeRewardToTeam({ ...state, missions, teams }, teamId, mission.rewardCoin);
+  let next = distributeRewardToTeam({ ...state, missions }, teamId, mission.rewardCoin);
   next = addEventLog(next, `${team.name}が「${mission.title}」を達成しました。`, "mission");
   next = addNotification(next, "ミッション達成", `${team.name}が「${mission.title}」を達成！`, "mission");
   return next;

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Card, Stat } from "@/components/Cards";
-import { EventLogList, NotificationList, RankingList, TeamRow } from "@/components/Lists";
+import { EventLogList, NotificationList, TeamRow } from "@/components/Lists";
 import { Shell } from "@/components/Shell";
 import { isPushSupported, registerServiceWorker, requestNotificationPermission } from "@/lib/push";
 import { useGameState } from "@/lib/useGameState";
@@ -59,11 +59,6 @@ export default function HomePage() {
               state.teams.map((team) => <TeamRow key={team.id} team={team} state={state} />)
             )}
           </div>
-        </Card>
-
-        <Card>
-          <h3 className="mb-3 text-lg font-black">ランキング</h3>
-          {state.teams.length === 0 ? <p className="text-sm text-slate-400">編成後に表示されます。</p> : <RankingList state={state} />}
         </Card>
 
         <Card>

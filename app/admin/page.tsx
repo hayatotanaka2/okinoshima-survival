@@ -32,7 +32,6 @@ export default function AdminPage() {
   const [missionTeamId, setMissionTeamId] = useState("");
   const [missionTitle, setMissionTitle] = useState("");
   const [missionDescription, setMissionDescription] = useState("");
-  const [missionRewardPoint, setMissionRewardPoint] = useState(100);
   const [missionRewardCoin, setMissionRewardCoin] = useState(500);
   const [missionDifficulty, setMissionDifficulty] = useState<MissionDifficulty>("normal");
   const [missionTargetType, setMissionTargetType] = useState<MissionTargetType>("team");
@@ -133,7 +132,6 @@ export default function AdminPage() {
       createMission(current, {
         title: missionTitle,
         description: missionDescription,
-        rewardPoint: missionRewardPoint,
         rewardCoin: missionRewardCoin,
         difficulty: missionDifficulty,
         targetType: missionTargetType,
@@ -150,7 +148,6 @@ export default function AdminPage() {
       updateMission(current, editMissionId, {
         title: missionTitle,
         description: missionDescription,
-        rewardPoint: missionRewardPoint,
         rewardCoin: missionRewardCoin,
         difficulty: missionDifficulty,
         targetType: missionTargetType,
@@ -321,13 +318,11 @@ export default function AdminPage() {
               <MissionFields
                 title={missionTitle}
                 description={missionDescription}
-                rewardPoint={missionRewardPoint}
                 rewardCoin={missionRewardCoin}
                 difficulty={missionDifficulty}
                 targetType={missionTargetType}
                 setTitle={setMissionTitle}
                 setDescription={setMissionDescription}
-                setRewardPoint={setMissionRewardPoint}
                 setRewardCoin={setMissionRewardCoin}
                 setDifficulty={setMissionDifficulty}
                 setTargetType={setMissionTargetType}
@@ -343,7 +338,6 @@ export default function AdminPage() {
                   setEditMissionId(value);
                   setMissionTitle(mission?.title ?? "");
                   setMissionDescription(mission?.description ?? "");
-                  setMissionRewardPoint(mission?.rewardPoint ?? 100);
                   setMissionRewardCoin(mission?.rewardCoin ?? 500);
                   setMissionDifficulty(mission?.difficulty ?? "normal");
                   setMissionTargetType(mission?.targetType ?? "team");
@@ -486,26 +480,22 @@ function DangerButton({ children, onClick, disabled }: { children: ReactNode; on
 function MissionFields({
   title,
   description,
-  rewardPoint,
   rewardCoin,
   difficulty,
   targetType,
   setTitle,
   setDescription,
-  setRewardPoint,
   setRewardCoin,
   setDifficulty,
   setTargetType,
 }: {
   title: string;
   description: string;
-  rewardPoint: number;
   rewardCoin: number;
   difficulty: MissionDifficulty;
   targetType: MissionTargetType;
   setTitle: (value: string) => void;
   setDescription: (value: string) => void;
-  setRewardPoint: (value: number) => void;
   setRewardCoin: (value: number) => void;
   setDifficulty: (value: MissionDifficulty) => void;
   setTargetType: (value: MissionTargetType) => void;
@@ -520,11 +510,7 @@ function MissionFields({
         説明
         <textarea className={inputClass} value={description} onChange={(event) => setDescription(event.target.value)} />
       </Field>
-      <div className="grid grid-cols-2 gap-2">
-        <Field>
-          報酬pt
-          <input className={inputClass} type="number" value={rewardPoint} onChange={(event) => setRewardPoint(Number(event.target.value))} />
-        </Field>
+      <div className="grid gap-2">
         <Field>
           報酬沖コイン
           <input className={inputClass} type="number" value={rewardCoin} onChange={(event) => setRewardCoin(Number(event.target.value))} />
