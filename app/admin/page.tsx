@@ -37,10 +37,10 @@ export default function AdminPage() {
   const [missionTargetType, setMissionTargetType] = useState<MissionTargetType>("team");
   const [editMissionId, setEditMissionId] = useState("");
   const [teamName, setTeamName] = useState("");
-  const [teamColor, setTeamColor] = useState("#19b7a6");
+  const [teamColor, setTeamColor] = useState("#00bfd6");
   const [editTeamId, setEditTeamId] = useState("");
   const [editTeamName, setEditTeamName] = useState("");
-  const [editTeamColor, setEditTeamColor] = useState("#19b7a6");
+  const [editTeamColor, setEditTeamColor] = useState("#00bfd6");
   const [itemId, setItemId] = useState("");
   const [itemOwnerId, setItemOwnerId] = useState("");
   const [itemOwnerType, setItemOwnerType] = useState<"member" | "team">("member");
@@ -186,7 +186,7 @@ export default function AdminPage() {
     <Shell title="管理者">
       <div className="grid gap-4">
         <AdminCard title="本番同期ステータス">
-          <div className={`rounded-md p-3 text-sm font-bold ${isSupabaseConfigured() ? "bg-lagoon text-slate-950" : "bg-ember text-slate-950"}`}>
+          <div className={`rounded-md p-3 text-sm font-bold ${isSupabaseConfigured() ? "bg-lagoon text-ink" : "bg-ember text-white"}`}>
             {isSupabaseConfigured() ? "Supabase環境変数は設定済みです。" : "Supabase環境変数が未設定です。現在はlocalStorage fallbackで動きます。"}
           </div>
           <p className="mt-2 text-sm text-slate-400">
@@ -263,7 +263,7 @@ export default function AdminPage() {
             </Field>
             <PrimaryButton type="submit" disabled={!teamName.trim()}>チーム追加</PrimaryButton>
           </form>
-          <form className="mt-5 grid gap-3 border-t border-white/10 pt-4" onSubmit={submitTeamEdit}>
+          <form className="mt-5 grid gap-3 border-t border-reef/10 pt-4" onSubmit={submitTeamEdit}>
             <SelectTeam
               state={state}
               value={editTeamId}
@@ -271,7 +271,7 @@ export default function AdminPage() {
                 const team = state.teams.find((candidate) => candidate.id === value);
                 setEditTeamId(value);
                 setEditTeamName(team?.name ?? "");
-                setEditTeamColor(team?.color ?? "#19b7a6");
+                  setEditTeamColor(team?.color ?? "#00bfd6");
               }}
             />
             <Field>
@@ -305,9 +305,12 @@ export default function AdminPage() {
             <SelectTeam state={state} value={missionTeamId} onChange={setMissionTeamId} />
             <div className="grid grid-cols-2 gap-2">
               <PrimaryButton disabled={!missionId} onClick={() => updateState((current) => setMissionStatus(current, missionId, "active"))}>発動</PrimaryButton>
+              <EmergencyButton disabled={!missionId} onClick={() => updateState((current) => setMissionStatus(current, missionId, "active", true))}>緊急発動</EmergencyButton>
               <PrimaryButton disabled={!missionId} onClick={() => updateState((current) => setMissionStatus(current, missionId, "closed"))}>終了</PrimaryButton>
               <PrimaryButton disabled={!missionId || !missionTeamId} onClick={() => updateState((current) => completeMissionForTeam(current, missionId, missionTeamId))}>達成承認</PrimaryButton>
-              <DangerButton disabled={!missionId} onClick={() => updateState((current) => deleteMission(current, missionId))}>削除</DangerButton>
+              <div className="col-span-2 grid">
+                <DangerButton disabled={!missionId} onClick={() => updateState((current) => deleteMission(current, missionId))}>削除</DangerButton>
+              </div>
             </div>
           </div>
         </AdminCard>
@@ -329,7 +332,7 @@ export default function AdminPage() {
               />
               <PrimaryButton type="submit" disabled={!missionTitle.trim()}>新規作成</PrimaryButton>
             </form>
-            <form className="grid gap-3 border-t border-white/10 pt-4" onSubmit={submitMissionEdit}>
+            <form className="grid gap-3 border-t border-reef/10 pt-4" onSubmit={submitMissionEdit}>
               <SelectMission
                 state={state}
                 value={editMissionId}
@@ -471,6 +474,19 @@ function DangerButton({ children, onClick, disabled }: { children: ReactNode; on
       onClick={onClick}
       disabled={disabled}
       className="min-h-11 rounded-md bg-red-500 px-4 py-2 text-sm font-black text-white disabled:cursor-not-allowed disabled:opacity-50"
+    >
+      {children}
+    </button>
+  );
+}
+
+function EmergencyButton({ children, onClick, disabled }: { children: ReactNode; onClick: () => void; disabled?: boolean }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className="min-h-11 rounded-md bg-ember px-4 py-2 text-sm font-black text-white shadow-[0_8px_22px_rgba(255,43,147,0.24)] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
     >
       {children}
     </button>

@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 * {
@@ -14,9 +14,10 @@ body {
   min-height: 100vh;
   margin: 0;
   background:
-    radial-gradient(circle at top left, rgba(25, 183, 166, 0.22), transparent 34rem),
-    linear-gradient(180deg, #08111f 0%, #0f172a 54%, #111827 100%);
-  color: #f8fafc;
+    linear-gradient(rgba(255, 255, 255, 0.8), rgba(248, 250, 255, 0.88)),
+    url("/virtual-world-bg.png") center top / cover fixed;
+  color: #202744;
+  letter-spacing: 0;
 }
 
 button,
@@ -28,4 +29,65 @@ textarea {
 
 .safe-bottom {
   padding-bottom: calc(5rem + env(safe-area-inset-bottom));
+}
+
+::selection {
+  background: #ff2b93;
+  color: #ffffff;
+}
+
+.emergency-overlay {
+  animation: emergency-fade 6.2s ease both;
+}
+
+.emergency-panel {
+  animation: emergency-panel-in 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.15) both;
+}
+
+.emergency-orbit {
+  animation: emergency-spin 1.4s linear infinite;
+}
+
+.emergency-scan {
+  animation: emergency-scan 1.1s ease-in-out infinite;
+}
+
+.emergency-progress {
+  animation: emergency-progress 5.7s linear forwards;
+  transform-origin: left;
+}
+
+@keyframes emergency-fade {
+  0% { opacity: 0; }
+  6%, 88% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes emergency-panel-in {
+  from { opacity: 0; transform: scale(0.86) translateY(24px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes emergency-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes emergency-scan {
+  0%, 100% { transform: translateY(-18px); opacity: 0; }
+  50% { transform: translateY(18px); opacity: 1; }
+}
+
+@keyframes emergency-progress {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .emergency-overlay,
+  .emergency-panel,
+  .emergency-orbit,
+  .emergency-scan,
+  .emergency-progress {
+    animation: none;
+  }
 }

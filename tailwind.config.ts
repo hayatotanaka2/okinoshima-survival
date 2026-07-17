@@ -8,14 +8,23 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        lagoon: "#19b7a6",
-        reef: "#2563eb",
-        ember: "#f97316",
-        shell: "#f8fafc",
-        midnight: "#08111f",
+        lagoon: "#00bfd6",
+        reef: "#6d4aff",
+        ember: "#ff2b93",
+        shell: "#ffffff",
+        midnight: "#ffffff",
+        ink: "#202744",
+        lime: "#a8e600",
+        sun: "#ffd83d",
+        slate: {
+          200: "#30395c",
+          300: "#4d5677",
+          400: "#68708e",
+          950: "#eef2f8",
+        },
       },
       boxShadow: {
-        glow: "0 18px 60px rgba(25, 183, 166, 0.22)",
+        glow: "0 18px 50px rgba(103, 73, 255, 0.12)",
       },
     },
   },

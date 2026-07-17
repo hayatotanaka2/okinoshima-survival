@@ -23,8 +23,11 @@ export default function MissionsPage() {
           return (
             <Card key={mission.id}>
               <div className="flex items-start justify-between gap-3">
-                <h2 className="text-lg font-black">{mission.title}</h2>
-                <span className="shrink-0 rounded-md bg-ember px-2 py-1 text-xs font-black text-slate-950">
+                <div>
+                  {mission.isEmergency && <p className="mb-1 text-xs font-black text-ember">緊急ミッション</p>}
+                  <h2 className="text-lg font-black">{mission.title}</h2>
+                </div>
+                <span className={`shrink-0 rounded-md px-2 py-1 text-xs font-black ${mission.status === "active" ? "bg-ember text-white" : "bg-lagoon text-ink"}`}>
                   {statusLabel[mission.status]}
                 </span>
               </div>

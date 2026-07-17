@@ -21,7 +21,7 @@ export default function MembersPage() {
                   <h2 className="text-lg font-black">{member.name}</h2>
                   <p className="text-sm text-slate-400">{team?.name ?? "未所属"}</p>
                 </div>
-                <p className="rounded-md bg-lagoon px-3 py-1 text-sm font-black text-slate-950">{member.coin}沖</p>
+                <p className="rounded-md bg-lagoon px-3 py-1 text-sm font-black text-ink">{member.coin}沖</p>
               </div>
               <div className="mt-3 grid grid-cols-2 gap-2">
                 <Stat label="累計獲得" value={`${member.totalEarnedCoin}`} />

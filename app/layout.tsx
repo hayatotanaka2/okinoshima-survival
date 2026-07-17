@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
+import { EmergencyMissionAlert } from "@/components/EmergencyMissionAlert";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -9,12 +10,12 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     title: "沖サバ",
-    statusBarStyle: "black-translucent",
+    statusBarStyle: "default",
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#08111f",
+  themeColor: "#ffffff",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -23,7 +24,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="ja">
-      <body>{children}</body>
+      <body>
+        {children}
+        <EmergencyMissionAlert />
+      </body>
     </html>
   );
 }

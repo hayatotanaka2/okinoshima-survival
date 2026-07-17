@@ -4,7 +4,7 @@ import { Card } from "./Cards";
 
 export function TeamRow({ team, state }: { team: Team; state: GameState }) {
   return (
-    <div className="rounded-md border border-white/10 bg-slate-950/45 p-3">
+    <div className="rounded-md border border-reef/10 bg-slate-950/45 p-3">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <span className="h-3 w-3 rounded-sm" style={{ background: team.color }} />

@@ -35,7 +35,7 @@ export default function AuctionPage() {
             <Card key={item.id}>
               <div className="flex items-start justify-between gap-3">
                 <h2 className="text-lg font-black">{item.name}</h2>
-                <span className="rounded-md bg-lagoon px-2 py-1 text-xs font-black text-slate-950">
+                <span className="rounded-md bg-lagoon px-2 py-1 text-xs font-black text-ink">
                   {item.status === "open" ? "開催中" : "落札済"}
                 </span>
               </div>

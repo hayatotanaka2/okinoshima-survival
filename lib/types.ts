@@ -33,6 +33,7 @@ export type Mission = {
   difficulty: MissionDifficulty;
   status: MissionStatus;
   targetType: MissionTargetType;
+  isEmergency?: boolean;
   rewardItemIds: string[];
   completedByTeamIds: string[];
   completedByMemberIds: string[];

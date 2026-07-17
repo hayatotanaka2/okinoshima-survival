@@ -40,7 +40,7 @@ export default function ItemsPage() {
             <Card key={item.id}>
               <div className="flex items-start justify-between gap-3">
                 <h2 className="text-lg font-black">{item.name}</h2>
-                <span className="rounded-md bg-white/10 px-2 py-1 text-xs font-bold">{item.status}</span>
+                <span className="rounded-md bg-violet-50 px-2 py-1 text-xs font-bold text-reef">{item.status}</span>
               </div>
               <p className="mt-2 text-sm leading-6 text-slate-300">{item.description}</p>
               <p className="mt-3 text-sm text-lagoon">価値: {item.value}沖</p>

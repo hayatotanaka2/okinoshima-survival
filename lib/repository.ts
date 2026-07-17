@@ -62,8 +62,9 @@ export function subscribeSharedGameState(onChange: (state: GameState) => void): 
   }
 
   const client = supabase;
+  const channelName = `game-state-main-${Date.now()}-${Math.random().toString(36).slice(2)}`;
   const channel = client
-    .channel("game-state-main")
+    .channel(channelName)
     .on(
       "postgres_changes",
       {

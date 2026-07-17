@@ -2,7 +2,7 @@ import { addEventLog, uid } from "./gameLogic";
 import type { GameState, Member, Team } from "./types";
 
 const teamNames = ["赤チーム", "青チーム", "黄チーム", "緑チーム", "紫チーム", "白チーム"];
-const teamColors = ["#ef4444", "#2563eb", "#facc15", "#22c55e", "#a855f7", "#f8fafc"];
+const teamColors = ["#ff2b93", "#00bfd6", "#ffd83d", "#a8e600", "#6d4aff", "#ff7a45"];
 
 export function calculateTeamCoin(team: Team, members: Member[]): number {
   return team.memberIds.reduce((sum, memberId) => {
@@ -44,7 +44,7 @@ export function randomizeTeams(state: GameState, teamCount: number): GameState {
   );
 }
 
-export function addTeam(state: GameState, name: string, color = "#19b7a6"): GameState {
+export function addTeam(state: GameState, name: string, color = "#00bfd6"): GameState {
   const team: Team = {
     id: uid("team"),
     name,

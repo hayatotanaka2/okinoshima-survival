@@ -60,16 +60,21 @@ export function deleteMission(state: GameState, missionId: string): GameState {
   );
 }
 
-export function setMissionStatus(state: GameState, missionId: string, status: MissionStatus): GameState {
+export function setMissionStatus(state: GameState, missionId: string, status: MissionStatus, emergency = false): GameState {
   const mission = state.missions.find((candidate) => candidate.id === missionId);
   const missions = state.missions.map((candidate) =>
     candidate.id === missionId
-      ? { ...candidate, status, updatedAt: new Date().toISOString() }
+      ? {
+          ...candidate,
+          status,
+          isEmergency: status === "active" ? emergency : candidate.isEmergency,
+          updatedAt: new Date().toISOString(),
+        }
       : candidate,
   );
   let next = addEventLog({ ...state, missions }, `ミッション「${mission?.title ?? ""}」を${status}にしました。`, "mission");
   if (status === "active" && mission) {
-    next = addNotification(next, "新ミッション発動", mission.title, "mission");
+    next = addNotification(next, emergency ? "緊急ミッション発令" : "新ミッション発動", mission.title, "mission");
   }
   return next;
 }

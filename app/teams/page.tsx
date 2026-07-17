@@ -13,7 +13,7 @@ export default function TeamsPage() {
   return (
     <Shell title="チーム">
       <div className="mb-4">
-        <Link href="/teams/compose" className="block rounded-md bg-lagoon px-4 py-3 text-center text-sm font-black text-slate-950">
+        <Link href="/teams/compose" className="block rounded-md bg-lagoon px-4 py-3 text-center text-sm font-black text-ink shadow-[0_8px_22px_rgba(0,191,214,0.18)]">
           チーム編成へ
         </Link>
       </div>
