@@ -72,7 +72,6 @@ export default function AdminPage() {
               <input className={inputClass} type="password" value={passcode} onChange={(event) => setPasscode(event.target.value)} />
             </Field>
             <PrimaryButton type="submit">入室する</PrimaryButton>
-            <p className="text-sm text-slate-400">MVPの仮パスコードは admin123 です。</p>
           </form>
         </Card>
       </Shell>
@@ -193,7 +192,11 @@ export default function AdminPage() {
           <div className={`rounded-md p-3 text-sm font-bold ${isSupabaseConfigured() ? "bg-lagoon text-slate-950" : "bg-ember text-slate-950"}`}>
             {isSupabaseConfigured() ? "Supabase環境変数は設定済みです。" : "Supabase環境変数が未設定です。現在はlocalStorage fallbackで動きます。"}
           </div>
-          <p className="mt-2 text-sm text-slate-400">Vercel本番では NEXT_PUBLIC_SUPABASE_URL と NEXT_PUBLIC_SUPABASE_ANON_KEY を設定してください。</p>
+          <p className="mt-2 text-sm text-slate-400">
+            {isSupabaseConfigured()
+              ? "全端末で同じゲーム状態を同期しています。"
+              : "Vercel本番では NEXT_PUBLIC_SUPABASE_URL と NEXT_PUBLIC_SUPABASE_ANON_KEY を設定してください。"}
+          </p>
         </AdminCard>
 
         <AdminCard title="メンバー追加">
