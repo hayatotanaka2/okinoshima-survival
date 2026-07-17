@@ -82,14 +82,22 @@ export function setMissionStatus(state: GameState, missionId: string, status: Mi
 export function completeMissionForTeam(state: GameState, missionId: string, teamId: string): GameState {
   const mission = state.missions.find((candidate) => candidate.id === missionId);
   const team = state.teams.find((candidate) => candidate.id === teamId);
-  if (!mission || !team || mission.completedByTeamIds.includes(teamId)) return state;
+  if (!mission || !team) return state;
+  const alreadyCompletedByCurrentTeam = (mission.completedTeamRecords ?? []).some(
+    (record) => record.teamId === teamId && record.completedAt >= team.createdAt,
+  );
+  if (alreadyCompletedByCurrentTeam) return state;
 
   const missions = state.missions.map((candidate) =>
     candidate.id === missionId
       ? {
           ...candidate,
           status: "completed" as const,
-          completedByTeamIds: [...candidate.completedByTeamIds, teamId],
+          completedByTeamIds: Array.from(new Set([...candidate.completedByTeamIds, teamId])),
+          completedTeamRecords: [
+            ...(candidate.completedTeamRecords ?? []),
+            { teamId, completedAt: new Date().toISOString() },
+          ],
           updatedAt: new Date().toISOString(),
         }
       : candidate,

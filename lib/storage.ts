@@ -46,6 +46,10 @@ export function normalizeGameState(state: GameState): GameState {
     }
     return item;
   });
+  const missions = (state.missions ?? []).map((mission) => ({
+    ...mission,
+    completedTeamRecords: mission.completedTeamRecords ?? [],
+  }));
 
   const membersWithItems = members.map((member) => {
     const ownedItemIds = items
@@ -62,6 +66,7 @@ export function normalizeGameState(state: GameState): GameState {
     members: membersWithItems,
     teams,
     items,
+    missions,
     submissions: state.submissions ?? [],
     eventLogs: state.eventLogs ?? [],
     notifications: state.notifications ?? [],

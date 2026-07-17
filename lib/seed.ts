@@ -66,6 +66,7 @@ export const seedMissions: Mission[] = [
   targetType: "team",
   rewardItemIds: [],
   completedByTeamIds: [],
+  completedTeamRecords: [],
   completedByMemberIds: [],
   createdAt: now,
   updatedAt: now,

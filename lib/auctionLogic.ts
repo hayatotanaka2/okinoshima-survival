@@ -66,6 +66,7 @@ export function settleAuctionItem(
       value: price,
       ownerType: "member",
       ownerMemberId: winnerMember.id,
+      acquiredTeamId: winnerTeamId,
       status: "owned",
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),

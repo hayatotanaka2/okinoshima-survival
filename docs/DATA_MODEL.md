@@ -85,6 +85,10 @@ type Mission = {
   targetType: MissionTargetType;
   rewardItemIds: string[];
   completedByTeamIds: string[];
+  completedTeamRecords?: {
+    teamId: string;
+    completedAt: string;
+  }[];
   completedByMemberIds: string[];
   createdAt: string;
   updatedAt: string;
@@ -117,11 +121,18 @@ type Item = {
   ownerType: OwnerType;
   ownerMemberId?: string;
   ownerTeamId?: string;
+  acquiredTeamId?: string;
   status: ItemStatus;
   createdAt: string;
   updatedAt: string;
 };
 ```
+
+`acquiredTeamId` は、その物資やカードを獲得・購入した時点の所属チームを表します。
+
+チームタブでは `acquiredTeamId` が現在のチームIDと一致し、かつアイテム更新日時が現在のチーム作成日時以降のものだけを表示します。
+
+ミッション達成は `completedTeamRecords` に時刻付きで保存します。チームタブでは、現在のチーム作成日時以降に達成されたミッションだけを表示します。
 
 ## 7. AuctionItem
 

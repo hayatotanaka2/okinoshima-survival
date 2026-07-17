@@ -13,6 +13,7 @@ export function assignItemToMember(state: GameState, itemId: string, memberId: s
           ownerType: "member" as const,
           ownerMemberId: memberId,
           ownerTeamId: undefined,
+          acquiredTeamId: member.currentTeamId,
           status: "owned" as const,
           updatedAt: new Date().toISOString(),
         }

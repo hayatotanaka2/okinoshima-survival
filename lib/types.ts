@@ -25,6 +25,11 @@ export type MissionStatus = "draft" | "active" | "completed" | "closed";
 export type MissionDifficulty = "easy" | "normal" | "hard" | "legend";
 export type MissionTargetType = "team" | "individual";
 
+export type MissionTeamCompletion = {
+  teamId: string;
+  completedAt: string;
+};
+
 export type Mission = {
   id: string;
   title: string;
@@ -36,6 +41,7 @@ export type Mission = {
   isEmergency?: boolean;
   rewardItemIds: string[];
   completedByTeamIds: string[];
+  completedTeamRecords?: MissionTeamCompletion[];
   completedByMemberIds: string[];
   createdAt: string;
   updatedAt: string;
@@ -64,6 +70,7 @@ export type Item = {
   ownerType: OwnerType;
   ownerMemberId?: string;
   ownerTeamId?: string;
+  acquiredTeamId?: string;
   status: ItemStatus;
   createdAt: string;
   updatedAt: string;

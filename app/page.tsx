@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Card, Stat } from "@/components/Cards";
-import { EventLogList, NotificationList, TeamRow } from "@/components/Lists";
+import { EventLogList, NotificationList } from "@/components/Lists";
 import { PlayerSelector } from "@/components/PlayerSelector";
 import { Shell } from "@/components/Shell";
 import { isPushSupported, registerServiceWorker, requestNotificationPermission } from "@/lib/push";
@@ -53,17 +53,6 @@ export default function HomePage() {
             </Link>
           ))}
         </div>
-
-        <Card>
-          <h3 className="mb-3 text-lg font-black">チーム一覧</h3>
-          <div className="grid gap-2">
-            {state.teams.length === 0 ? (
-              <p className="text-sm text-slate-400">まだチームがありません。チーム編成から作成してください。</p>
-            ) : (
-              state.teams.map((team) => <TeamRow key={team.id} team={team} state={state} />)
-            )}
-          </div>
-        </Card>
 
         <Card>
           <h3 className="mb-3 text-lg font-black">最新通知</h3>
