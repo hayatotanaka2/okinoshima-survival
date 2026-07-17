@@ -8,7 +8,7 @@ import { Shell } from "@/components/Shell";
 import { settleAuctionItem } from "@/lib/auctionLogic";
 import { addCoinToMember, subtractCoinFromMember } from "@/lib/coinLogic";
 import { addEventLog, addNotification, uid } from "@/lib/gameLogic";
-import { assignItemToMember, assignItemToTeam } from "@/lib/itemLogic";
+import { assignItemToMember } from "@/lib/itemLogic";
 import { deleteMember, updateMemberName } from "@/lib/memberLogic";
 import { approveMissionSubmission, completeMissionForTeam, createMission, deleteMission, rejectMissionSubmission, setMissionStatus, updateMission } from "@/lib/missionLogic";
 import { addTeam, deleteTeam, moveMemberToTeam, randomizeTeams, updateTeam } from "@/lib/teamLogic";
@@ -43,9 +43,9 @@ export default function AdminPage() {
   const [editTeamColor, setEditTeamColor] = useState("#00bfd6");
   const [itemId, setItemId] = useState("");
   const [itemOwnerId, setItemOwnerId] = useState("");
-  const [itemOwnerType, setItemOwnerType] = useState<"member" | "team">("member");
   const [auctionId, setAuctionId] = useState("");
   const [auctionTeamId, setAuctionTeamId] = useState("");
+  const [auctionWinnerMemberId, setAuctionWinnerMemberId] = useState("");
   const [auctionPrice, setAuctionPrice] = useState(500);
   const [noticeTitle, setNoticeTitle] = useState("");
   const [noticeBody, setNoticeBody] = useState("");
@@ -387,17 +387,11 @@ export default function AdminPage() {
                 {state.items.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
               </select>
             </Field>
-            <Field>
-              付与先
-              <select className={inputClass} value={itemOwnerType} onChange={(event) => setItemOwnerType(event.target.value as "member" | "team")}>
-                <option value="member">個人</option>
-                <option value="team">チーム</option>
-              </select>
-            </Field>
-            {itemOwnerType === "member" ? <SelectMember state={state} value={itemOwnerId} onChange={setItemOwnerId} /> : <SelectTeam state={state} value={itemOwnerId} onChange={setItemOwnerId} />}
+            <SelectMember state={state} value={itemOwnerId} onChange={setItemOwnerId} />
+            <p className="text-sm text-slate-400">チーム替え後も所有関係が残るよう、物資・カードは個人へ付与します。</p>
             <PrimaryButton
               disabled={!itemId || !itemOwnerId}
-              onClick={() => updateState((current) => itemOwnerType === "member" ? assignItemToMember(current, itemId, itemOwnerId) : assignItemToTeam(current, itemId, itemOwnerId))}
+              onClick={() => updateState((current) => assignItemToMember(current, itemId, itemOwnerId))}
             >
               付与する
             </PrimaryButton>
@@ -413,12 +407,20 @@ export default function AdminPage() {
                 {state.auctionItems.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
               </select>
             </Field>
-            <SelectTeam state={state} value={auctionTeamId} onChange={setAuctionTeamId} />
+            <SelectTeam
+              state={state}
+              value={auctionTeamId}
+              onChange={(value) => {
+                setAuctionTeamId(value);
+                setAuctionWinnerMemberId("");
+              }}
+            />
+            <SelectMemberFromTeam state={state} teamId={auctionTeamId} value={auctionWinnerMemberId} onChange={setAuctionWinnerMemberId} />
             <Field>
               落札価格
               <input className={inputClass} type="number" value={auctionPrice} onChange={(event) => setAuctionPrice(Number(event.target.value))} />
             </Field>
-            <PrimaryButton disabled={!auctionId || !auctionTeamId} onClick={() => updateState((current) => settleAuctionItem(current, auctionId, auctionTeamId, auctionPrice))}>落札処理</PrimaryButton>
+            <PrimaryButton disabled={!auctionId || !auctionTeamId || !auctionWinnerMemberId} onClick={() => updateState((current) => settleAuctionItem(current, auctionId, auctionTeamId, auctionPrice, auctionWinnerMemberId))}>落札処理</PrimaryButton>
           </div>
         </AdminCard>
 
@@ -582,6 +584,29 @@ function SelectTeam({ state, value, onChange }: { state: { teams: { id: string; 
       <select className={inputClass} value={value} onChange={(event) => onChange(event.target.value)}>
         <option value="">選択してください</option>
         {state.teams.map((team) => <option key={team.id} value={team.id}>{team.name}</option>)}
+      </select>
+    </Field>
+  );
+}
+
+function SelectMemberFromTeam({
+  state,
+  teamId,
+  value,
+  onChange,
+}: {
+  state: { members: { id: string; name: string; currentTeamId?: string }[] };
+  teamId: string;
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  const members = state.members.filter((member) => member.currentTeamId === teamId);
+  return (
+    <Field>
+      受け取りメンバー
+      <select className={inputClass} value={value} onChange={(event) => onChange(event.target.value)} disabled={!teamId}>
+        <option value="">選択してください</option>
+        {members.map((member) => <option key={member.id} value={member.id}>{member.name}</option>)}
       </select>
     </Field>
   );

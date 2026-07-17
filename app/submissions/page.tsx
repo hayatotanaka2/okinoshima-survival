@@ -1,11 +1,12 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { Card, Field, PrimaryButton, inputClass } from "@/components/Cards";
 import { Shell } from "@/components/Shell";
 import { createMissionSubmission } from "@/lib/missionLogic";
 import { uploadMissionPhoto } from "@/lib/photoStorage";
 import { useGameState } from "@/lib/useGameState";
+import { useSelectedMember } from "@/lib/useSelectedMember";
 
 export default function SubmissionsPage() {
   const { state, updateState } = useGameState();
@@ -16,6 +17,12 @@ export default function SubmissionsPage() {
   const [file, setFile] = useState<File | null>(null);
   const [message, setMessage] = useState("");
   const [uploading, setUploading] = useState(false);
+  const { selectedMemberId, selectedMember, setSelectedMemberId } = useSelectedMember(state);
+
+  useEffect(() => {
+    if (selectedMemberId && !memberId) setMemberId(selectedMemberId);
+    if (selectedMember?.currentTeamId && !teamId) setTeamId(selectedMember.currentTeamId);
+  }, [memberId, selectedMember, selectedMemberId, teamId]);
 
   if (!state) return <Shell title="写真投稿"><p>読み込み中...</p></Shell>;
 
@@ -70,7 +77,17 @@ export default function SubmissionsPage() {
             </Field>
             <Field>
               投稿者
-              <select className={inputClass} value={memberId} onChange={(event) => setMemberId(event.target.value)}>
+              <select
+                className={inputClass}
+                value={memberId}
+                onChange={(event) => {
+                  const nextMemberId = event.target.value;
+                  const nextMember = state.members.find((member) => member.id === nextMemberId);
+                  setMemberId(nextMemberId);
+                  setSelectedMemberId(nextMemberId);
+                  if (nextMember?.currentTeamId) setTeamId(nextMember.currentTeamId);
+                }}
+              >
                 <option value="">選択してください</option>
                 {state.members.map((member) => (
                   <option key={member.id} value={member.id}>{member.name}</option>

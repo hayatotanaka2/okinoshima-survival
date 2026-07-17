@@ -77,6 +77,7 @@ export type AuctionItem = {
   description: string;
   currentPrice: number;
   winnerTeamId?: string;
+  winnerMemberId?: string;
   status: AuctionStatus;
   createdAt: string;
   updatedAt: string;

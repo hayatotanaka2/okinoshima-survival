@@ -1,15 +1,21 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { Card, Field, PrimaryButton, inputClass } from "@/components/Cards";
 import { Shell } from "@/components/Shell";
 import { claimTreasureByCode } from "@/lib/treasureLogic";
 import { useGameState } from "@/lib/useGameState";
+import { useSelectedMember } from "@/lib/useSelectedMember";
 
 export default function QrPage() {
   const { state, updateState } = useGameState();
   const [code, setCode] = useState("");
   const [memberId, setMemberId] = useState("");
+  const { selectedMemberId, setSelectedMemberId } = useSelectedMember(state);
+
+  useEffect(() => {
+    if (selectedMemberId && !memberId) setMemberId(selectedMemberId);
+  }, [memberId, selectedMemberId]);
 
   if (!state) return <Shell title="宝箱"><p>読み込み中...</p></Shell>;
 
@@ -31,7 +37,14 @@ export default function QrPage() {
             </Field>
             <Field>
               取得者
-              <select className={inputClass} value={memberId} onChange={(event) => setMemberId(event.target.value)}>
+              <select
+                className={inputClass}
+                value={memberId}
+                onChange={(event) => {
+                  setMemberId(event.target.value);
+                  setSelectedMemberId(event.target.value);
+                }}
+              >
                 <option value="">選択してください</option>
                 {state.members.map((member) => (
                   <option key={member.id} value={member.id}>{member.name}</option>

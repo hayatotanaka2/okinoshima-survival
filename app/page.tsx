@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Card, Stat } from "@/components/Cards";
 import { EventLogList, NotificationList, TeamRow } from "@/components/Lists";
+import { PlayerSelector } from "@/components/PlayerSelector";
 import { Shell } from "@/components/Shell";
 import { isPushSupported, registerServiceWorker, requestNotificationPermission } from "@/lib/push";
 import { useGameState } from "@/lib/useGameState";
@@ -43,6 +44,8 @@ export default function HomePage() {
           <Stat label="参加者" value={`${state.members.length}人`} />
           <Stat label="チーム" value={`${state.teams.length}`} />
         </div>
+
+        <PlayerSelector state={state} />
 
         <div className="grid grid-cols-2 gap-2">
           {quickLinks.map(([href, label]) => (

@@ -134,11 +134,20 @@ type AuctionItem = {
   description: string;
   currentPrice: number;
   winnerTeamId?: string;
+  winnerMemberId?: string;
   status: AuctionStatus;
   createdAt: string;
   updatedAt: string;
 };
 ```
+
+落札時の支払いは `winnerTeamId` のメンバーで人数割りにし、落札品の受け取り先は `winnerMemberId` の個人に紐づけます。
+
+## 7.1 端末プレイヤー選択
+
+ログイン機能はMVPでは実装しません。
+
+各端末では `selectedMemberId` をlocalStorageに保存し、宝箱取得、写真投稿、物資使用、オークション入札の初期選択に使います。沖コインや所持物資などの本体データはSupabase上のGameStateに保存します。
 
 ## 8. Treasure
 

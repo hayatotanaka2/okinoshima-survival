@@ -1,21 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, Field, PrimaryButton, inputClass } from "@/components/Cards";
 import { Shell } from "@/components/Shell";
 import { placeAuctionBid } from "@/lib/auctionLogic";
 import { useGameState } from "@/lib/useGameState";
+import { useSelectedMember } from "@/lib/useSelectedMember";
 
 export default function AuctionPage() {
   const { state, updateState } = useGameState();
   const [bidTeamId, setBidTeamId] = useState("");
   const [bidPrices, setBidPrices] = useState<Record<string, number>>({});
+  const { selectedMember, selectedMemberId, setSelectedMemberId } = useSelectedMember(state);
+
+  useEffect(() => {
+    if (selectedMember?.currentTeamId && !bidTeamId) setBidTeamId(selectedMember.currentTeamId);
+  }, [bidTeamId, selectedMember]);
+
   if (!state) return <Shell title="オークション"><p>読み込み中...</p></Shell>;
 
   return (
     <Shell title="オークション">
       <div className="grid gap-3">
         <Card>
+          <Field>
+            自分
+            <select className={inputClass} value={selectedMemberId} onChange={(event) => setSelectedMemberId(event.target.value)}>
+              <option value="">選択してください</option>
+              {state.members.map((member) => (
+                <option key={member.id} value={member.id}>{member.name}</option>
+              ))}
+            </select>
+          </Field>
           <Field>
             入札チーム
             <select className={inputClass} value={bidTeamId} onChange={(event) => setBidTeamId(event.target.value)}>
@@ -25,11 +41,12 @@ export default function AuctionPage() {
               ))}
             </select>
           </Field>
-          <p className="mt-2 text-sm text-slate-400">現在価格より高い金額で入札できます。最終落札処理は管理者が行います。</p>
+          <p className="mt-2 text-sm text-slate-400">自分を選ぶと所属チームが自動で入ります。支払いはチームメンバーで割り勘、落札品は管理者が受け取り個人へ付与します。</p>
         </Card>
 
         {state.auctionItems.map((item) => {
           const team = state.teams.find((candidate) => candidate.id === item.winnerTeamId);
+          const winnerMember = state.members.find((candidate) => candidate.id === item.winnerMemberId);
           const bidPrice = bidPrices[item.id] ?? item.currentPrice + 100;
           return (
             <Card key={item.id}>
@@ -42,6 +59,7 @@ export default function AuctionPage() {
               <p className="mt-2 text-sm leading-6 text-slate-300">{item.description}</p>
               <p className="mt-3 text-xl font-black text-ember">{item.currentPrice}沖</p>
               <p className="mt-1 text-sm text-slate-400">{item.status === "open" ? "最高入札" : "落札"}チーム: {team?.name ?? "未定"}</p>
+              {winnerMember && <p className="mt-1 text-sm text-slate-400">受け取り: {winnerMember.name}</p>}
               <div className="mt-3 grid grid-cols-[1fr_auto] gap-2">
                 <input
                   className={inputClass}

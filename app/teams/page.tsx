@@ -21,7 +21,7 @@ export default function TeamsPage() {
         {state.teams.length === 0 && <Card>まだチームがありません。</Card>}
         {state.teams.map((team) => {
           const members = state.members.filter((member) => team.memberIds.includes(member.id));
-          const items = state.items.filter((item) => item.ownerTeamId === team.id);
+          const items = state.items.filter((item) => item.ownerMemberId && team.memberIds.includes(item.ownerMemberId));
           const completed = state.missions.filter((mission) => mission.completedByTeamIds.includes(team.id));
           return (
             <Card key={team.id}>
@@ -37,7 +37,7 @@ export default function TeamsPage() {
                 <p className="text-sm font-black text-lagoon">メンバー</p>
                 <p className="mt-1 text-sm text-slate-200">{members.map((member) => member.name).join("、") || "未設定"}</p>
               </div>
-              <p className="mt-4 text-sm text-slate-300">物資: {items.map((item) => item.name).join("、") || "なし"}</p>
+              <p className="mt-4 text-sm text-slate-300">所属メンバーの物資: {items.map((item) => item.name).join("、") || "なし"}</p>
               <p className="mt-2 text-sm text-slate-300">達成: {completed.map((mission) => mission.title).join("、") || "なし"}</p>
             </Card>
           );

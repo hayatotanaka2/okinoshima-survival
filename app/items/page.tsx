@@ -1,17 +1,17 @@
 "use client";
 
-import { useState } from "react";
 import { Card, Field, PrimaryButton, inputClass } from "@/components/Cards";
 import { Shell } from "@/components/Shell";
 import { useItem } from "@/lib/itemLogic";
 import { useGameState } from "@/lib/useGameState";
+import { useSelectedMember } from "@/lib/useSelectedMember";
 
 export default function ItemsPage() {
   const { state, updateState } = useGameState();
-  const [actorMemberId, setActorMemberId] = useState("");
+  const { selectedMemberId, selectedMember, setSelectedMemberId } = useSelectedMember(state);
   if (!state) return <Shell title="物資"><p>読み込み中...</p></Shell>;
 
-  const actor = state.members.find((member) => member.id === actorMemberId);
+  const actor = selectedMember;
 
   return (
     <Shell title="物資">
@@ -19,14 +19,14 @@ export default function ItemsPage() {
         <Card>
           <Field>
             操作するメンバー
-            <select className={inputClass} value={actorMemberId} onChange={(event) => setActorMemberId(event.target.value)}>
+            <select className={inputClass} value={selectedMemberId} onChange={(event) => setSelectedMemberId(event.target.value)}>
               <option value="">選択してください</option>
               {state.members.map((member) => (
                 <option key={member.id} value={member.id}>{member.name}</option>
               ))}
             </select>
           </Field>
-          <p className="mt-2 text-sm text-slate-400">自分または所属チームの所有物資を使用できます。</p>
+          <p className="mt-2 text-sm text-slate-400">この選択は端末に保存されます。自分の所有物資を使用できます。</p>
         </Card>
 
         {state.items.map((item) => {
@@ -35,7 +35,7 @@ export default function ItemsPage() {
           const canUse =
             actor &&
             item.status === "owned" &&
-            (item.ownerMemberId === actor.id || item.ownerTeamId === actor.currentTeamId);
+            item.ownerMemberId === actor.id;
           return (
             <Card key={item.id}>
               <div className="flex items-start justify-between gap-3">
