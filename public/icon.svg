@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#08111f"/>
+  <circle cx="256" cy="250" r="154" fill="#19b7a6"/>
+  <path d="M102 332c82-52 151-52 236 0 34 20 56 25 92 12-34 62-96 96-174 96-75 0-132-31-154-108Z" fill="#f97316"/>
+  <path d="M162 256c34-72 84-108 150-108 28 0 54 7 78 22-29 1-53 10-72 27 42 3 72 22 90 57-57-21-108-21-153 1-31 15-62 15-93 1Z" fill="#f8fafc"/>
+  <text x="256" y="292" text-anchor="middle" font-family="Arial, sans-serif" font-size="74" font-weight="900" fill="#08111f">沖</text>
+</svg>

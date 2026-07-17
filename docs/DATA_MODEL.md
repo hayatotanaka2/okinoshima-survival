@@ -1,0 +1,221 @@
+# DATA_MODEL.md
+
+## 1. 方針
+
+MVPではSupabaseにGameState全体を保存します。
+
+Supabase未設定時だけlocalStorage fallbackで動かします。画面から直接localStorageやSupabaseを触らず、必ず repository 層を経由します。
+
+## 2. GameState
+
+```ts
+type GameState = {
+  members: Member[];
+  teams: Team[];
+  missions: Mission[];
+  items: Item[];
+  auctionItems: AuctionItem[];
+  treasures: Treasure[];
+  eventLogs: EventLog[];
+  notifications: AppNotification[];
+  gameStatus: GameStatus;
+  updatedAt: string;
+};
+```
+
+## 2.1 Supabase Table
+
+```sql
+game_states (
+  id text primary key,
+  state jsonb not null,
+  updated_at timestamptz not null
+)
+```
+
+MVPでは `id = 'main'` の1行だけを使います。
+
+## 3. Member
+
+```ts
+type Member = {
+  id: string;
+  name: string;
+  coin: number;
+  totalEarnedCoin: number;
+  totalSpentCoin: number;
+  currentTeamId?: string;
+  itemIds: string[];
+  createdAt: string;
+  updatedAt: string;
+};
+```
+
+沖コインは個人に保存します。
+
+## 4. Team
+
+```ts
+type Team = {
+  id: string;
+  name: string;
+  color: string;
+  point: number;
+  memberIds: string[];
+  createdAt: string;
+  updatedAt: string;
+};
+```
+
+チームの合計沖コインは保存せず、所属メンバーのcoin合計から計算します。
+
+## 5. Mission
+
+```ts
+type MissionStatus = "draft" | "active" | "completed" | "closed";
+type MissionDifficulty = "easy" | "normal" | "hard" | "legend";
+type MissionTargetType = "team" | "individual";
+
+type Mission = {
+  id: string;
+  title: string;
+  description: string;
+  rewardPoint: number;
+  rewardCoin: number;
+  difficulty: MissionDifficulty;
+  status: MissionStatus;
+  targetType: MissionTargetType;
+  rewardItemIds: string[];
+  completedByTeamIds: string[];
+  completedByMemberIds: string[];
+  createdAt: string;
+  updatedAt: string;
+};
+```
+
+## 6. Item
+
+```ts
+type ItemType =
+  | "food"
+  | "bbq"
+  | "drink"
+  | "privilege"
+  | "hint"
+  | "defense"
+  | "civilization"
+  | "sabotage"
+  | "other";
+
+type ItemStatus = "available" | "owned" | "used";
+type OwnerType = "member" | "team" | "none";
+
+type Item = {
+  id: string;
+  name: string;
+  description: string;
+  type: ItemType;
+  value: number;
+  ownerType: OwnerType;
+  ownerMemberId?: string;
+  ownerTeamId?: string;
+  status: ItemStatus;
+  createdAt: string;
+  updatedAt: string;
+};
+```
+
+## 7. AuctionItem
+
+```ts
+type AuctionStatus = "open" | "closed";
+
+type AuctionItem = {
+  id: string;
+  name: string;
+  description: string;
+  currentPrice: number;
+  winnerTeamId?: string;
+  status: AuctionStatus;
+  createdAt: string;
+  updatedAt: string;
+};
+```
+
+## 8. Treasure
+
+```ts
+type TreasureStatus = "hidden" | "claimed";
+type TreasureRewardType = "coin" | "item";
+
+type Treasure = {
+  id: string;
+  code: string;
+  title: string;
+  description: string;
+  rewardType: TreasureRewardType;
+  rewardCoin?: number;
+  rewardItemId?: string;
+  claimedByMemberId?: string;
+  claimedByTeamId?: string;
+  claimedAt?: string;
+  status: TreasureStatus;
+  createdAt: string;
+  updatedAt: string;
+};
+```
+
+MVPではQR読み取りではなく、宝箱コード入力で実装してよいです。
+
+## 9. EventLog
+
+```ts
+type EventLogType =
+  | "team"
+  | "mission"
+  | "item"
+  | "auction"
+  | "coin"
+  | "treasure"
+  | "system"
+  | "notification";
+
+type EventLog = {
+  id: string;
+  message: string;
+  type: EventLogType;
+  createdAt: string;
+};
+```
+
+重要操作はすべてEventLogに残します。
+
+## 10. AppNotification
+
+```ts
+type NotificationType =
+  | "mission"
+  | "item"
+  | "auction"
+  | "treasure"
+  | "system";
+
+type AppNotification = {
+  id: string;
+  title: string;
+  body: string;
+  type: NotificationType;
+  readByMemberIds: string[];
+  createdAt: string;
+};
+```
+
+MVPではアプリ内通知としてGameStateに保存します。Supabase設定済みなら全端末に同期されます。
+
+## 11. GameStatus
+
+```ts
+type GameStatus = "setup" | "playing" | "auction" | "finished";
+```
+
+トップ画面に現在の状態として表示します。

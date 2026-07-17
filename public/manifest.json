@@ -1,0 +1,18 @@
+{
+  "name": "沖ノ島サバイバル",
+  "short_name": "沖サバ",
+  "description": "同期旅行で使う沖ノ島サバイバルゲームPWA",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#08111f",
+  "theme_color": "#08111f",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

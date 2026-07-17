@@ -1,0 +1,166 @@
+import type {
+  AuctionItem,
+  GameState,
+  Item,
+  Member,
+  Mission,
+  Treasure,
+} from "./types";
+
+const now = "2026-07-04T00:00:00.000Z";
+
+const names = [
+  "参加者01",
+  "参加者02",
+  "参加者03",
+  "参加者04",
+  "参加者05",
+  "参加者06",
+  "参加者07",
+  "参加者08",
+  "参加者09",
+  "参加者10",
+  "参加者11",
+  "参加者12",
+  "参加者13",
+  "参加者14",
+  "参加者15",
+  "参加者16",
+  "参加者17",
+  "参加者18",
+  "参加者19",
+  "参加者20",
+  "参加者21",
+];
+
+export const seedMembers: Member[] = names.map((name, index) => ({
+  id: `member-${index + 1}`,
+  name,
+  coin: 500,
+  totalEarnedCoin: 500,
+  totalSpentCoin: 0,
+  currentTeamId: undefined,
+  itemIds: [],
+  createdAt: now,
+  updatedAt: now,
+}));
+
+export const seedMissions: Mission[] = [
+  ["mission-1", "海の生物を3種類発見する", "写真か口頭説明で幹事に報告する。", 80, 600, "normal"],
+  ["mission-2", "一番綺麗な貝を拾う", "各チーム1つ提出。幹事の独断と偏見で判定。", 60, 400, "easy"],
+  ["mission-3", "流木で武器っぽいものを作る", "安全な範囲で作り、写真を撮る。", 100, 800, "normal"],
+  ["mission-4", "全員で遭難写真を撮る", "チーム全員が写った遭難感のある写真を撮る。", 120, 900, "hard"],
+  ["mission-5", "島を横断する", "指定地点までチームで移動する。", 150, 1200, "hard"],
+  ["mission-6", "海水で顔を洗う", "代表者1名で達成可能。", 40, 200, "easy"],
+  ["mission-7", "他チームと物資交換する", "交換成立を幹事に報告する。", 90, 700, "normal"],
+  ["mission-8", "サンセット写真を撮る", "夕方限定。最も映えたチームに追加評価。", 150, 1000, "legend"],
+].map(([id, title, description, rewardPoint, rewardCoin, difficulty]) => ({
+  id: String(id),
+  title: String(title),
+  description: String(description),
+  rewardPoint: Number(rewardPoint),
+  rewardCoin: Number(rewardCoin),
+  difficulty: difficulty as Mission["difficulty"],
+  status: "draft",
+  targetType: "team",
+  rewardItemIds: [],
+  completedByTeamIds: [],
+  completedByMemberIds: [],
+  createdAt: now,
+  updatedAt: now,
+}));
+
+export const seedItems: Item[] = [
+  ["item-1", "飲み物券", "好きな飲み物を1本交換できる。", "drink", 300],
+  ["item-2", "BBQ強化券", "BBQ食材を少し豪華にできる。", "bbq", 1000],
+  ["item-3", "アイス券", "アイスと交換できる。", "food", 400],
+  ["item-4", "酒交換券", "指定のお酒と交換できる。", "drink", 700],
+  ["item-5", "おつまみ券", "おつまみを獲得できる。", "food", 350],
+  ["item-6", "罰ゲーム回避券", "軽い罰ゲームを1回回避できる。", "defense", 900],
+  ["item-7", "ヒント券", "ミッションのヒントを1回もらえる。", "hint", 500],
+  ["item-8", "火解放カード", "文明が一段進んだ気分になれる。", "civilization", 800],
+  ["item-9", "武器カード", "次ミッションの演出に使える。", "civilization", 800],
+  ["item-10", "妨害カード", "相手チームに30秒ハンデを与える。", "sabotage", 700],
+].map(([id, name, description, type, value]) => ({
+  id: String(id),
+  name: String(name),
+  description: String(description),
+  type: type as Item["type"],
+  value: Number(value),
+  ownerType: "none",
+  status: "available",
+  createdAt: now,
+  updatedAt: now,
+}));
+
+export const seedAuctionItems: AuctionItem[] = [
+  ["auction-1", "高級肉", "BBQの主役。場がざわつく肉。", 1500],
+  ["auction-2", "ハーゲンダッツ", "夜の勝者だけが得る冷たい栄光。", 500],
+  ["auction-3", "朝片付け免除", "翌朝の片付けを免除。", 1200],
+  ["auction-4", "風呂優先券", "風呂の順番を優先できる。", 1000],
+  ["auction-5", "ベッド優先券", "寝床選びを優先できる。", 1200],
+  ["auction-6", "罰ゲーム回避券", "ここぞという時の保険。", 800],
+].map(([id, name, description, currentPrice]) => ({
+  id: String(id),
+  name: String(name),
+  description: String(description),
+  currentPrice: Number(currentPrice),
+  status: "open",
+  createdAt: now,
+  updatedAt: now,
+}));
+
+export const seedTreasures: Treasure[] = [
+  {
+    id: "treasure-1",
+    code: "OKI-001",
+    title: "浜辺の小箱",
+    description: "砂浜で見つかる序盤の宝箱。",
+    rewardType: "coin",
+    rewardCoin: 300,
+    status: "hidden",
+    createdAt: now,
+    updatedAt: now,
+  },
+  {
+    id: "treasure-2",
+    code: "OKI-FIRE",
+    title: "火の文明",
+    description: "文明の気配がするカード。",
+    rewardType: "item",
+    rewardItemId: "item-8",
+    status: "hidden",
+    createdAt: now,
+    updatedAt: now,
+  },
+];
+
+export const createInitialGameState = (): GameState => ({
+  members: seedMembers,
+  teams: [],
+  missions: seedMissions,
+  items: seedItems,
+  auctionItems: seedAuctionItems,
+  treasures: seedTreasures,
+  submissions: [],
+  eventLogs: [
+    {
+      id: "log-1",
+      message: "沖ノ島サバイバルの準備ができました。",
+      type: "system",
+      createdAt: now,
+    },
+  ],
+  notifications: [
+    {
+      id: "notice-1",
+      title: "ゲーム準備完了",
+      body: "メンバー登録、チーム編成、ミッション発動を始められます。",
+      type: "system",
+      readByMemberIds: [],
+      createdAt: now,
+    },
+  ],
+  gameStatus: "setup",
+  updatedAt: now,
+});
