@@ -17,6 +17,7 @@ type GameState = {
   auctionItems: AuctionItem[];
   treasures: Treasure[];
   moraleReports: MoraleReport[];
+  pushSubscriptions: PushSubscriptionRecord[];
   eventLogs: EventLog[];
   notifications: AppNotification[];
   gameStatus: GameStatus;
@@ -238,6 +239,24 @@ type AppNotification = {
 ```
 
 MVPではアプリ内通知としてGameStateに保存します。Supabase設定済みなら全端末に同期されます。
+
+## 10.2 PushSubscriptionRecord
+
+```ts
+type PushSubscriptionRecord = {
+  endpoint: string;
+  keys: {
+    p256dh: string;
+    auth: string;
+  };
+  memberId?: string;
+  userAgent?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+```
+
+通知許可済み端末のWeb Push購読情報です。ミッション通知と告発通知だけ、Vercel API Routeから送信します。
 
 ## 10.1 MoraleReport
 

@@ -6,7 +6,7 @@ import { Card } from "@/components/Cards";
 import { EventLogList, NotificationList } from "@/components/Lists";
 import { PlayerSelector } from "@/components/PlayerSelector";
 import { Shell } from "@/components/Shell";
-import { isPushSupported, registerServiceWorker, requestNotificationPermission } from "@/lib/push";
+import { getPushSubscription, isPushSupported, registerServiceWorker, subscribeToPushNotifications, upsertPushSubscription } from "@/lib/push";
 import { useGameState } from "@/lib/useGameState";
 import { useSelectedMember } from "@/lib/useSelectedMember";
 
@@ -22,7 +22,7 @@ const quickLinks = [
 ];
 
 export default function HomePage() {
-  const { state } = useGameState();
+  const { state, updateState } = useGameState();
   const { selectedMember } = useSelectedMember(state);
 
   if (!state) return <Shell title="僕らのサマーウォーズ ver-B"><p>読み込み中...</p></Shell>;
@@ -60,14 +60,20 @@ export default function HomePage() {
           <EventLogList logs={state.eventLogs} />
         </Card>
 
-        <PwaNotice />
+        <PwaNotice selectedMemberId={selectedMember?.id} updateState={updateState} />
       </div>
     </Shell>
   );
 }
 
-function PwaNotice() {
-  const [message, setMessage] = useState("通知はホーム画面に追加したPWAで許可すると安定します。");
+function PwaNotice({
+  selectedMemberId,
+  updateState,
+}: {
+  selectedMemberId?: string;
+  updateState: ReturnType<typeof useGameState>["updateState"];
+}) {
+  const [message, setMessage] = useState("ミッション通知と告発通知は、Push通知を許可すると閉じていても届きます。");
 
   async function requestPermission() {
     await registerServiceWorker();
@@ -75,8 +81,20 @@ function PwaNotice() {
       setMessage("このブラウザではPush通知の一部機能が未対応です。MVPではアプリ内通知を使えます。");
       return;
     }
-    const permission = await requestNotificationPermission();
-    setMessage(`通知権限: ${permission}`);
+    const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+    if (!publicKey) {
+      setMessage("Push通知用の公開キーが未設定です。Vercelと.env.localにNEXT_PUBLIC_VAPID_PUBLIC_KEYを設定してください。");
+      return;
+    }
+
+    const subscription = (await getPushSubscription()) ?? (await subscribeToPushNotifications(publicKey));
+    if (!subscription) {
+      setMessage("通知が許可されませんでした。ホーム画面に追加したPWAから許可すると安定します。");
+      return;
+    }
+
+    updateState((current) => upsertPushSubscription(current, subscription, selectedMemberId));
+    setMessage("Push通知を登録しました。ミッション通知と告発通知が閉じていても届きます。");
   }
 
   return (

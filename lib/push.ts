@@ -1,5 +1,7 @@
 "use client";
 
+import type { AppNotification, GameState, PushSubscriptionRecord } from "./types";
+
 export function isPushSupported(): boolean {
   return (
     typeof window !== "undefined" &&
@@ -49,6 +51,77 @@ export async function subscribeToPushNotifications(publicVapidKey: string): Prom
     userVisibleOnly: true,
     applicationServerKey: urlBase64ToArrayBuffer(publicVapidKey),
   });
+}
+
+export function upsertPushSubscription(
+  state: GameState,
+  subscription: PushSubscription,
+  memberId?: string,
+): GameState {
+  const record = toPushSubscriptionRecord(subscription, memberId);
+  const existing = state.pushSubscriptions.find((candidate) => candidate.endpoint === record.endpoint);
+  const pushSubscriptions = existing
+    ? state.pushSubscriptions.map((candidate) =>
+        candidate.endpoint === record.endpoint
+          ? {
+              ...candidate,
+              keys: record.keys,
+              memberId: record.memberId ?? candidate.memberId,
+              userAgent: record.userAgent,
+              updatedAt: record.updatedAt,
+            }
+          : candidate,
+      )
+    : [record, ...state.pushSubscriptions];
+
+  return { ...state, pushSubscriptions };
+}
+
+export async function sendNewImportantPushNotifications(previous: GameState, next: GameState): Promise<void> {
+  if (typeof window === "undefined") return;
+  const previousIds = new Set(previous.notifications.map((notification) => notification.id));
+  const targets = next.notifications.filter(
+    (notification) =>
+      !previousIds.has(notification.id) &&
+      (notification.type === "mission" || notification.type === "morale"),
+  );
+  if (targets.length === 0 || next.pushSubscriptions.length === 0) return;
+
+  await Promise.all(targets.map((notification) => sendPushNotification(notification, next.pushSubscriptions)));
+}
+
+async function sendPushNotification(notification: AppNotification, subscriptions: PushSubscriptionRecord[]): Promise<void> {
+  try {
+    await fetch("/api/push/send", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: notification.title,
+        body: notification.body,
+        type: notification.type,
+        url: notification.type === "morale" ? "/morale" : "/missions",
+        subscriptions,
+      }),
+    });
+  } catch {
+    // Pushは補助通知なので、失敗してもゲーム操作自体は止めない。
+  }
+}
+
+function toPushSubscriptionRecord(subscription: PushSubscription, memberId?: string): PushSubscriptionRecord {
+  const json = subscription.toJSON();
+  const now = new Date().toISOString();
+  return {
+    endpoint: json.endpoint ?? subscription.endpoint,
+    keys: {
+      p256dh: json.keys?.p256dh ?? "",
+      auth: json.keys?.auth ?? "",
+    },
+    memberId,
+    userAgent: typeof navigator === "undefined" ? undefined : navigator.userAgent,
+    createdAt: now,
+    updatedAt: now,
+  };
 }
 
 function urlBase64ToArrayBuffer(base64String: string): ArrayBuffer {

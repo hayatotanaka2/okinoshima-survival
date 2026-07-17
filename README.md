@@ -92,13 +92,32 @@ Vercel本番で全員が同じゲーム状態を見るにはSupabase設定が必
 ```txt
 NEXT_PUBLIC_SUPABASE_URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY
+NEXT_PUBLIC_VAPID_PUBLIC_KEY
+VAPID_PRIVATE_KEY
+VAPID_SUBJECT
 ```
 
 Supabase未設定の場合はlocalStorage fallbackで動きますが、その場合は端末ごとに別データになります。
 
 ## 通知
 
-MVPではアプリ内通知をGameStateに保存して表示します。Supabase設定済みなら全員に同期されます。Web Push通知は将来拡張用の雛形のみ用意しています。
+MVPではアプリ内通知をGameStateに保存して表示します。Supabase設定済みなら全員に同期されます。
+
+ミッション通知と告発通知はWeb Push通知にも対応しています。iPhoneではホーム画面に追加したPWAから「通知を許可する」を押してください。
+
+Web Pushを使うにはVAPIDキーが必要です。
+
+```sh
+npx web-push generate-vapid-keys
+```
+
+`.env.local` とVercel Environment Variablesに以下を設定します。
+
+```txt
+NEXT_PUBLIC_VAPID_PUBLIC_KEY
+VAPID_PRIVATE_KEY
+VAPID_SUBJECT
+```
 
 ## ホーム画面
 

@@ -114,6 +114,7 @@ export function normalizeGameState(state: GameState): GameState {
       verdict: report.verdict ?? "pending",
       updatedAt: report.updatedAt ?? report.createdAt,
     })),
+    pushSubscriptions: state.pushSubscriptions ?? [],
   };
 }
 

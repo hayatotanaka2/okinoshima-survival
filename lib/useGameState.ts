@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { sendNewImportantPushNotifications } from "./push";
 import { loadSharedGameState, saveSharedGameState, subscribeSharedGameState } from "./repository";
 import { resetGameState } from "./storage";
 import type { GameState } from "./types";
@@ -28,6 +29,7 @@ export function useGameState() {
       if (!base) return current;
       const next = { ...updater(base), updatedAt: new Date().toISOString() };
       void saveSharedGameState(next);
+      void sendNewImportantPushNotifications(base, next);
       return next;
     });
   }

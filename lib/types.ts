@@ -210,6 +210,18 @@ export type AppNotification = {
   createdAt: string;
 };
 
+export type PushSubscriptionRecord = {
+  endpoint: string;
+  keys: {
+    p256dh: string;
+    auth: string;
+  };
+  memberId?: string;
+  userAgent?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type GameState = {
   members: Member[];
   teams: Team[];
@@ -219,6 +231,7 @@ export type GameState = {
   treasures: Treasure[];
   submissions: MissionSubmission[];
   moraleReports: MoraleReport[];
+  pushSubscriptions: PushSubscriptionRecord[];
   eventLogs: EventLog[];
   notifications: AppNotification[];
   gameStatus: GameStatus;

@@ -152,6 +152,7 @@ export const createInitialGameState = (): GameState => ({
   treasures: seedTreasures,
   submissions: [],
   moraleReports: [],
+  pushSubscriptions: [],
   eventLogs: [
     {
       id: "log-1",
