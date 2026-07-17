@@ -10,11 +10,11 @@ import { addCoinToMember, subtractCoinFromMember } from "@/lib/coinLogic";
 import { addEventLog, addNotification, uid } from "@/lib/gameLogic";
 import { assignItemToMember } from "@/lib/itemLogic";
 import { deleteMember, updateMemberName } from "@/lib/memberLogic";
-import { approveMissionSubmission, completeMissionForTeam, createMission, deleteMission, rejectMissionSubmission, setMissionStatus, updateMission } from "@/lib/missionLogic";
+import { applyRankingRewards, approveMissionSubmission, completeMissionForTeam, createMission, deleteMission, rejectMissionSubmission, setMissionStatus, updateMission } from "@/lib/missionLogic";
 import { addTeam, applyTeamDraft, buildRandomTeams, calculateTeamCoin, deleteTeam, moveMemberToTeam, updateTeam } from "@/lib/teamLogic";
 import { isSupabaseConfigured } from "@/lib/supabaseClient";
 import { useGameState } from "@/lib/useGameState";
-import type { GameState, MissionDifficulty, MissionTargetType, Team, Treasure } from "@/lib/types";
+import type { GameState, ItemType, MissionCategory, MissionDifficulty, MissionRequirement, MissionRewardKind, MissionRewardMode, MissionTargetType, Team, Treasure } from "@/lib/types";
 
 export default function AdminPage() {
   const { state, updateState, reset } = useGameState();
@@ -37,7 +37,25 @@ export default function AdminPage() {
   const [missionRewardCoin, setMissionRewardCoin] = useState(500);
   const [missionDifficulty, setMissionDifficulty] = useState<MissionDifficulty>("normal");
   const [missionTargetType, setMissionTargetType] = useState<MissionTargetType>("team");
+  const [missionCategory, setMissionCategory] = useState<MissionCategory>("single");
+  const [missionRequirement, setMissionRequirement] = useState<MissionRequirement>("optional");
+  const [missionRequiresPhoto, setMissionRequiresPhoto] = useState(true);
+  const [missionRequiresCode, setMissionRequiresCode] = useState(false);
+  const [missionTreasureCode, setMissionTreasureCode] = useState("");
+  const [missionRewardKind, setMissionRewardKind] = useState<MissionRewardKind>("coin");
+  const [missionRewardMode, setMissionRewardMode] = useState<MissionRewardMode>("same");
+  const [missionRewardItemName, setMissionRewardItemName] = useState("");
+  const [missionRewardItemDescription, setMissionRewardItemDescription] = useState("");
+  const [missionRewardItemType, setMissionRewardItemType] = useState<ItemType>("privilege");
+  const [missionRewardItemValue, setMissionRewardItemValue] = useState(500);
+  const [rankingRewards, setRankingRewards] = useState([
+    { rank: 1, rewardKind: "coin" as MissionRewardKind, rewardCoin: 1000, rewardItemName: "", rewardItemDescription: "", rewardItemType: "privilege" as ItemType, rewardItemValue: 1000 },
+    { rank: 2, rewardKind: "coin" as MissionRewardKind, rewardCoin: 600, rewardItemName: "", rewardItemDescription: "", rewardItemType: "privilege" as ItemType, rewardItemValue: 600 },
+    { rank: 3, rewardKind: "coin" as MissionRewardKind, rewardCoin: 300, rewardItemName: "", rewardItemDescription: "", rewardItemType: "privilege" as ItemType, rewardItemValue: 300 },
+  ]);
   const [editMissionId, setEditMissionId] = useState("");
+  const [rankingMissionId, setRankingMissionId] = useState("");
+  const [rankingTeamIds, setRankingTeamIds] = useState(["", "", ""]);
   const [teamName, setTeamName] = useState("");
   const [teamColor, setTeamColor] = useState("#00bfd6");
   const [editTeamId, setEditTeamId] = useState("");
@@ -137,10 +155,41 @@ export default function AdminPage() {
         rewardCoin: missionRewardCoin,
         difficulty: missionDifficulty,
         targetType: missionTargetType,
+        category: missionCategory,
+        requirement: missionRequirement,
+        requiresPhoto: missionRequiresPhoto,
+        requiresCode: missionRequiresCode || missionCategory === "emergency-treasure",
+        treasureCode: missionTreasureCode,
+        rewardKind: missionRewardKind,
+        rewardMode: missionRewardMode,
+        rewardItem: missionRewardKind === "item"
+          ? {
+              name: missionRewardItemName,
+              description: missionRewardItemDescription,
+              type: missionRewardItemType,
+              value: missionRewardItemValue,
+            }
+          : undefined,
+        rankingRewards: rankingRewards.map((reward) => ({
+          rank: reward.rank,
+          rewardKind: reward.rewardKind,
+          rewardCoin: reward.rewardCoin,
+          rewardItem: reward.rewardKind === "item"
+            ? {
+                name: reward.rewardItemName,
+                description: reward.rewardItemDescription,
+                type: reward.rewardItemType,
+                value: reward.rewardItemValue,
+              }
+            : undefined,
+        })),
       }),
     );
     setMissionTitle("");
     setMissionDescription("");
+    setMissionTreasureCode("");
+    setMissionRewardItemName("");
+    setMissionRewardItemDescription("");
   }
 
   function submitMissionEdit(event: FormEvent) {
@@ -153,6 +202,34 @@ export default function AdminPage() {
         rewardCoin: missionRewardCoin,
         difficulty: missionDifficulty,
         targetType: missionTargetType,
+        category: missionCategory,
+        requirement: missionRequirement,
+        requiresPhoto: missionRequiresPhoto,
+        requiresCode: missionRequiresCode || missionCategory === "emergency-treasure",
+        treasureCode: missionTreasureCode,
+        rewardKind: missionRewardKind,
+        rewardMode: missionRewardMode,
+        rewardItem: missionRewardKind === "item"
+          ? {
+              name: missionRewardItemName,
+              description: missionRewardItemDescription,
+              type: missionRewardItemType,
+              value: missionRewardItemValue,
+            }
+          : undefined,
+        rankingRewards: rankingRewards.map((reward) => ({
+          rank: reward.rank,
+          rewardKind: reward.rewardKind,
+          rewardCoin: reward.rewardCoin,
+          rewardItem: reward.rewardKind === "item"
+            ? {
+                name: reward.rewardItemName,
+                description: reward.rewardItemDescription,
+                type: reward.rewardItemType,
+                value: reward.rewardItemValue,
+              }
+            : undefined,
+        })),
       }),
     );
   }
@@ -371,13 +448,37 @@ export default function AdminPage() {
                 rewardCoin={missionRewardCoin}
                 difficulty={missionDifficulty}
                 targetType={missionTargetType}
+                category={missionCategory}
+                requirement={missionRequirement}
+                requiresPhoto={missionRequiresPhoto}
+                requiresCode={missionRequiresCode}
+                treasureCode={missionTreasureCode}
+                rewardKind={missionRewardKind}
+                rewardMode={missionRewardMode}
+                rewardItemName={missionRewardItemName}
+                rewardItemDescription={missionRewardItemDescription}
+                rewardItemType={missionRewardItemType}
+                rewardItemValue={missionRewardItemValue}
+                rankingRewards={rankingRewards}
                 setTitle={setMissionTitle}
                 setDescription={setMissionDescription}
                 setRewardCoin={setMissionRewardCoin}
                 setDifficulty={setMissionDifficulty}
                 setTargetType={setMissionTargetType}
+                setCategory={setMissionCategory}
+                setRequirement={setMissionRequirement}
+                setRequiresPhoto={setMissionRequiresPhoto}
+                setRequiresCode={setMissionRequiresCode}
+                setTreasureCode={setMissionTreasureCode}
+                setRewardKind={setMissionRewardKind}
+                setRewardMode={setMissionRewardMode}
+                setRewardItemName={setMissionRewardItemName}
+                setRewardItemDescription={setMissionRewardItemDescription}
+                setRewardItemType={setMissionRewardItemType}
+                setRewardItemValue={setMissionRewardItemValue}
+                setRankingRewards={setRankingRewards}
               />
-              <PrimaryButton type="submit" disabled={!missionTitle.trim()}>新規作成</PrimaryButton>
+              <PrimaryButton type="submit" disabled={!missionTitle.trim() || (missionRewardKind === "item" && !missionRewardItemName.trim())}>作成して発令</PrimaryButton>
             </form>
             <form className="grid gap-3 border-t border-reef/10 pt-4" onSubmit={submitMissionEdit}>
               <SelectMission
@@ -391,6 +492,31 @@ export default function AdminPage() {
                   setMissionRewardCoin(mission?.rewardCoin ?? 500);
                   setMissionDifficulty(mission?.difficulty ?? "normal");
                   setMissionTargetType(mission?.targetType ?? "team");
+                  setMissionCategory(mission?.category ?? "single");
+                  setMissionRequirement(mission?.requirement ?? "optional");
+                  setMissionRequiresPhoto(mission?.requiresPhoto ?? true);
+                  setMissionRequiresCode(mission?.requiresCode ?? false);
+                  setMissionTreasureCode(mission?.treasureCode ?? "");
+                  setMissionRewardKind(mission?.rewardKind ?? "coin");
+                  setMissionRewardMode(mission?.rewardMode ?? "same");
+                  setMissionRewardItemName(mission?.rewardItem?.name ?? "");
+                  setMissionRewardItemDescription(mission?.rewardItem?.description ?? "");
+                  setMissionRewardItemType(mission?.rewardItem?.type ?? "privilege");
+                  setMissionRewardItemValue(mission?.rewardItem?.value ?? 500);
+                  if (mission?.rankingRewards?.length) {
+                    setRankingRewards([1, 2, 3].map((rank) => {
+                      const reward = mission.rankingRewards?.find((candidate) => candidate.rank === rank);
+                      return {
+                        rank,
+                        rewardKind: reward?.rewardKind ?? "coin",
+                        rewardCoin: reward?.rewardCoin ?? 0,
+                        rewardItemName: reward?.rewardItem?.name ?? "",
+                        rewardItemDescription: reward?.rewardItem?.description ?? "",
+                        rewardItemType: reward?.rewardItem?.type ?? "privilege",
+                        rewardItemValue: reward?.rewardItem?.value ?? 0,
+                      };
+                    }));
+                  }
                 }}
               />
               <PrimaryButton type="submit" disabled={!editMissionId || !missionTitle.trim()}>選択中ミッションを上の内容で更新</PrimaryButton>
@@ -405,9 +531,14 @@ export default function AdminPage() {
               const mission = state.missions.find((candidate) => candidate.id === submission.missionId);
               const team = state.teams.find((candidate) => candidate.id === submission.teamId);
               const member = state.members.find((candidate) => candidate.id === submission.submittedByMemberId);
+              const imageUrls = submission.imageUrls ?? [submission.imageUrl].filter(Boolean);
               return (
                 <div key={submission.id} className="rounded-md bg-slate-950/50 p-3">
-                  <img src={submission.imageUrl} alt="" className="mb-3 aspect-video w-full rounded-md object-cover" />
+                  <div className="mb-3 grid grid-cols-2 gap-2">
+                    {imageUrls.map((url) => (
+                      <img key={url} src={url} alt="" className="aspect-video w-full rounded-md object-cover" />
+                    ))}
+                  </div>
                   <p className="font-black">{mission?.title ?? "ミッション"}</p>
                   <p className="text-sm text-slate-400">{team?.name ?? "チーム"} / 投稿者: {member?.name ?? "不明"} / {submission.status}</p>
                   {submission.comment && <p className="mt-2 text-sm text-slate-300">{submission.comment}</p>}
@@ -422,6 +553,37 @@ export default function AdminPage() {
                 </div>
               );
             })}
+          </div>
+        </AdminCard>
+
+        <AdminCard title="ランキング報酬確定">
+          <div className="grid gap-3">
+            <SelectMission
+              state={{ missions: state.missions.filter((mission) => mission.rewardMode === "ranking" && mission.status === "active") }}
+              value={rankingMissionId}
+              onChange={setRankingMissionId}
+            />
+            {[0, 1, 2].map((index) => (
+              <Field key={index}>
+                {index + 1}位チーム
+                <select
+                  className={inputClass}
+                  value={rankingTeamIds[index]}
+                  onChange={(event) =>
+                    setRankingTeamIds((current) => current.map((value, valueIndex) => (valueIndex === index ? event.target.value : value)))
+                  }
+                >
+                  <option value="">選択してください</option>
+                  {state.teams.map((team) => <option key={team.id} value={team.id}>{team.name}</option>)}
+                </select>
+              </Field>
+            ))}
+            <PrimaryButton
+              disabled={!rankingMissionId || rankingTeamIds.every((teamId) => !teamId)}
+              onClick={() => updateState((current) => applyRankingRewards(current, rankingMissionId, rankingTeamIds.filter(Boolean)))}
+            >
+              ランキング報酬を確定
+            </PrimaryButton>
           </div>
         </AdminCard>
 
@@ -603,23 +765,73 @@ function MissionFields({
   rewardCoin,
   difficulty,
   targetType,
+  category,
+  requirement,
+  requiresPhoto,
+  requiresCode,
+  treasureCode,
+  rewardKind,
+  rewardMode,
+  rewardItemName,
+  rewardItemDescription,
+  rewardItemType,
+  rewardItemValue,
+  rankingRewards,
   setTitle,
   setDescription,
   setRewardCoin,
   setDifficulty,
   setTargetType,
+  setCategory,
+  setRequirement,
+  setRequiresPhoto,
+  setRequiresCode,
+  setTreasureCode,
+  setRewardKind,
+  setRewardMode,
+  setRewardItemName,
+  setRewardItemDescription,
+  setRewardItemType,
+  setRewardItemValue,
+  setRankingRewards,
 }: {
   title: string;
   description: string;
   rewardCoin: number;
   difficulty: MissionDifficulty;
   targetType: MissionTargetType;
+  category: MissionCategory;
+  requirement: MissionRequirement;
+  requiresPhoto: boolean;
+  requiresCode: boolean;
+  treasureCode: string;
+  rewardKind: MissionRewardKind;
+  rewardMode: MissionRewardMode;
+  rewardItemName: string;
+  rewardItemDescription: string;
+  rewardItemType: ItemType;
+  rewardItemValue: number;
+  rankingRewards: Array<{ rank: number; rewardKind: MissionRewardKind; rewardCoin: number; rewardItemName: string; rewardItemDescription: string; rewardItemType: ItemType; rewardItemValue: number }>;
   setTitle: (value: string) => void;
   setDescription: (value: string) => void;
   setRewardCoin: (value: number) => void;
   setDifficulty: (value: MissionDifficulty) => void;
   setTargetType: (value: MissionTargetType) => void;
+  setCategory: (value: MissionCategory) => void;
+  setRequirement: (value: MissionRequirement) => void;
+  setRequiresPhoto: (value: boolean) => void;
+  setRequiresCode: (value: boolean) => void;
+  setTreasureCode: (value: string) => void;
+  setRewardKind: (value: MissionRewardKind) => void;
+  setRewardMode: (value: MissionRewardMode) => void;
+  setRewardItemName: (value: string) => void;
+  setRewardItemDescription: (value: string) => void;
+  setRewardItemType: (value: ItemType) => void;
+  setRewardItemValue: (value: number) => void;
+  setRankingRewards: (value: Array<{ rank: number; rewardKind: MissionRewardKind; rewardCoin: number; rewardItemName: string; rewardItemDescription: string; rewardItemType: ItemType; rewardItemValue: number }>) => void;
 }) {
+  const forcedRequired = category === "emergency-treasure" || category === "emergency-battle";
+  const codeRequired = requiresCode || category === "emergency-treasure";
   return (
     <>
       <Field>
@@ -630,30 +842,144 @@ function MissionFields({
         説明
         <textarea className={inputClass} value={description} onChange={(event) => setDescription(event.target.value)} />
       </Field>
-      <div className="grid gap-2">
+      <Field>
+        種類
+        <select className={inputClass} value={category} onChange={(event) => setCategory(event.target.value as MissionCategory)}>
+          <option value="permanent-1">常設ミッション1セット</option>
+          <option value="permanent-2">常設ミッション2セット</option>
+          <option value="emergency-treasure">緊急宝探しミッション</option>
+          <option value="emergency-battle">緊急バトルミッション</option>
+          <option value="single">単発ミッション</option>
+        </select>
+      </Field>
+      <div className="grid grid-cols-2 gap-2">
+        <Field>
+          必須/任意
+          <select className={inputClass} value={forcedRequired ? "required" : requirement} onChange={(event) => setRequirement(event.target.value as MissionRequirement)} disabled={forcedRequired}>
+            <option value="required">必須</option>
+            <option value="optional">任意</option>
+          </select>
+        </Field>
+        <Field>
+          報酬形式
+          <select className={inputClass} value={rewardMode} onChange={(event) => setRewardMode(event.target.value as MissionRewardMode)}>
+            <option value="same">全チーム同一報酬</option>
+            <option value="ranking">ランキング報酬</option>
+          </select>
+        </Field>
+      </div>
+      <div className="grid gap-2 rounded-md border border-reef/15 bg-white/80 p-3">
+        <label className="flex items-center gap-2 text-sm font-bold text-ink">
+          <input type="checkbox" className="h-5 w-5 accent-lagoon" checked={requiresPhoto} onChange={(event) => setRequiresPhoto(event.target.checked)} />
+          写真投稿を必要にする
+        </label>
+        <label className="flex items-center gap-2 text-sm font-bold text-ink">
+          <input type="checkbox" className="h-5 w-5 accent-lagoon" checked={codeRequired} onChange={(event) => setRequiresCode(event.target.checked)} disabled={category === "emergency-treasure"} />
+          コード入力を必要にする
+        </label>
+      </div>
+      {codeRequired && (
+        <Field>
+          正解コード
+          <input className={inputClass} value={treasureCode} onChange={(event) => setTreasureCode(event.target.value)} placeholder="OKI-001" />
+        </Field>
+      )}
+      <Field>
+        報酬タイプ
+        <select className={inputClass} value={rewardKind} onChange={(event) => setRewardKind(event.target.value as MissionRewardKind)}>
+          <option value="coin">沖コイン</option>
+          <option value="item">物資・カード</option>
+        </select>
+      </Field>
+      {rewardKind === "coin" ? (
         <Field>
           報酬沖コイン
           <input className={inputClass} type="number" value={rewardCoin} onChange={(event) => setRewardCoin(Number(event.target.value))} />
         </Field>
-      </div>
-      <div className="grid grid-cols-2 gap-2">
-        <Field>
-          難易度
-          <select className={inputClass} value={difficulty} onChange={(event) => setDifficulty(event.target.value as MissionDifficulty)}>
-            <option value="easy">easy</option>
-            <option value="normal">normal</option>
-            <option value="hard">hard</option>
-            <option value="legend">legend</option>
-          </select>
-        </Field>
-        <Field>
-          対象
-          <select className={inputClass} value={targetType} onChange={(event) => setTargetType(event.target.value as MissionTargetType)}>
-            <option value="team">team</option>
-            <option value="individual">individual</option>
-          </select>
-        </Field>
-      </div>
+      ) : (
+        <div className="grid gap-2 rounded-md border border-reef/15 bg-white/80 p-3">
+          <Field>
+            カード名
+            <input className={inputClass} value={rewardItemName} onChange={(event) => setRewardItemName(event.target.value)} />
+          </Field>
+          <Field>
+            カード説明
+            <textarea className={inputClass} value={rewardItemDescription} onChange={(event) => setRewardItemDescription(event.target.value)} />
+          </Field>
+          <div className="grid grid-cols-2 gap-2">
+            <Field>
+              種類
+              <select className={inputClass} value={rewardItemType} onChange={(event) => setRewardItemType(event.target.value as ItemType)}>
+                <option value="privilege">特典</option>
+                <option value="hint">ヒント</option>
+                <option value="defense">防御</option>
+                <option value="civilization">文明</option>
+                <option value="sabotage">妨害</option>
+                <option value="food">食べ物</option>
+                <option value="drink">飲み物</option>
+                <option value="other">その他</option>
+              </select>
+            </Field>
+            <Field>
+              価値
+              <input className={inputClass} type="number" value={rewardItemValue} onChange={(event) => setRewardItemValue(Number(event.target.value))} />
+            </Field>
+          </div>
+        </div>
+      )}
+      <input type="hidden" value={difficulty} onChange={(event) => setDifficulty(event.target.value as MissionDifficulty)} />
+      <input type="hidden" value={targetType} onChange={(event) => setTargetType(event.target.value as MissionTargetType)} />
+      {rewardMode === "ranking" && (
+        <div className="grid gap-3 rounded-md border border-reef/15 bg-white/80 p-3">
+          <p className="text-sm font-black text-ink">ランキング報酬</p>
+          {rankingRewards.map((reward, index) => (
+            <div key={reward.rank} className="grid gap-2 rounded-md bg-cyan-50/70 p-2">
+              <p className="text-sm font-black text-reef">{reward.rank}位</p>
+              <Field>
+                報酬タイプ
+                <select
+                  className={inputClass}
+                  value={reward.rewardKind}
+                  onChange={(event) => setRankingRewards(rankingRewards.map((current, currentIndex) => currentIndex === index ? { ...current, rewardKind: event.target.value as MissionRewardKind } : current))}
+                >
+                  <option value="coin">沖コイン</option>
+                  <option value="item">物資・カード</option>
+                </select>
+              </Field>
+              {reward.rewardKind === "coin" ? (
+                <Field>
+                  報酬沖コイン
+                  <input
+                    className={inputClass}
+                    type="number"
+                    value={reward.rewardCoin}
+                    onChange={(event) => setRankingRewards(rankingRewards.map((current, currentIndex) => currentIndex === index ? { ...current, rewardCoin: Number(event.target.value) } : current))}
+                  />
+                </Field>
+              ) : (
+                <>
+                  <Field>
+                    カード名
+                    <input
+                      className={inputClass}
+                      value={reward.rewardItemName}
+                      onChange={(event) => setRankingRewards(rankingRewards.map((current, currentIndex) => currentIndex === index ? { ...current, rewardItemName: event.target.value } : current))}
+                    />
+                  </Field>
+                  <Field>
+                    カード説明
+                    <textarea
+                      className={inputClass}
+                      value={reward.rewardItemDescription}
+                      onChange={(event) => setRankingRewards(rankingRewards.map((current, currentIndex) => currentIndex === index ? { ...current, rewardItemDescription: event.target.value } : current))}
+                    />
+                  </Field>
+                </>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </>
   );
 }

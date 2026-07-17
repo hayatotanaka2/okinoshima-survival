@@ -45,6 +45,7 @@ export default function SubmissionsPage() {
           teamId,
           submittedByMemberId: memberId,
           imageUrl,
+          imageUrls: [imageUrl],
           comment,
         }),
       );

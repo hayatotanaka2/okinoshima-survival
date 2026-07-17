@@ -25,3 +25,7 @@ export async function uploadMissionPhoto(file: File): Promise<string> {
     reader.readAsDataURL(file);
   });
 }
+
+export async function uploadMissionPhotos(files: File[]): Promise<string[]> {
+  return Promise.all(files.map((file) => uploadMissionPhoto(file)));
+}

@@ -24,10 +24,34 @@ export type Team = {
 export type MissionStatus = "draft" | "active" | "completed" | "closed";
 export type MissionDifficulty = "easy" | "normal" | "hard" | "legend";
 export type MissionTargetType = "team" | "individual";
+export type MissionCategory =
+  | "permanent-1"
+  | "permanent-2"
+  | "emergency-treasure"
+  | "emergency-battle"
+  | "single";
+export type MissionRequirement = "required" | "optional";
+export type MissionRewardKind = "coin" | "item";
+export type MissionRewardMode = "same" | "ranking";
+
+export type MissionItemReward = {
+  name: string;
+  description: string;
+  type: ItemType;
+  value: number;
+};
+
+export type MissionRankingReward = {
+  rank: number;
+  rewardKind: MissionRewardKind;
+  rewardCoin: number;
+  rewardItem?: MissionItemReward;
+};
 
 export type MissionTeamCompletion = {
   teamId: string;
   completedAt: string;
+  rank?: number;
 };
 
 export type Mission = {
@@ -38,7 +62,16 @@ export type Mission = {
   difficulty: MissionDifficulty;
   status: MissionStatus;
   targetType: MissionTargetType;
+  category?: MissionCategory;
+  requirement?: MissionRequirement;
+  requiresPhoto?: boolean;
+  requiresCode?: boolean;
+  treasureCode?: string;
+  rewardKind?: MissionRewardKind;
+  rewardMode?: MissionRewardMode;
   isEmergency?: boolean;
+  rewardItem?: MissionItemReward;
+  rankingRewards?: MissionRankingReward[];
   rewardItemIds: string[];
   completedByTeamIds: string[];
   completedTeamRecords?: MissionTeamCompletion[];
@@ -127,6 +160,7 @@ export type MissionSubmission = {
   teamId: string;
   submittedByMemberId: string;
   imageUrl: string;
+  imageUrls?: string[];
   comment: string;
   status: MissionSubmissionStatus;
   createdAt: string;

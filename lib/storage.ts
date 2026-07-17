@@ -49,6 +49,13 @@ export function normalizeGameState(state: GameState): GameState {
   const missions = (state.missions ?? []).map((mission) => ({
     ...mission,
     status: mission.status === "completed" ? ("active" as const) : mission.status,
+    category: mission.category ?? "single",
+    requirement: mission.requirement ?? "optional",
+    requiresPhoto: mission.requiresPhoto ?? true,
+    requiresCode: mission.requiresCode ?? false,
+    rewardKind: mission.rewardKind ?? "coin",
+    rewardMode: mission.rewardMode ?? "same",
+    rankingRewards: mission.rankingRewards ?? [],
     completedTeamRecords:
       mission.completedTeamRecords?.length
         ? mission.completedTeamRecords
@@ -74,10 +81,13 @@ export function normalizeGameState(state: GameState): GameState {
     teams,
     items,
     missions,
-    submissions: state.submissions ?? [],
     eventLogs: state.eventLogs ?? [],
     notifications: state.notifications ?? [],
     treasures: state.treasures ?? [],
+    submissions: (state.submissions ?? []).map((submission) => ({
+      ...submission,
+      imageUrls: submission.imageUrls ?? [submission.imageUrl].filter(Boolean),
+    })),
   };
 }
 

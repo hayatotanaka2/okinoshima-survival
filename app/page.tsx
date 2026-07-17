@@ -15,8 +15,6 @@ const quickLinks = [
   ["/missions", "ミッション"],
   ["/items", "物資"],
   ["/auction", "オークション"],
-  ["/submissions", "写真投稿"],
-  ["/qr", "宝箱"],
   ["/admin", "管理者"],
 ];
 
@@ -57,6 +55,28 @@ export default function HomePage() {
         <Card>
           <h3 className="mb-3 text-lg font-black">最新通知</h3>
           <NotificationList notifications={state.notifications} />
+        </Card>
+
+        <Card>
+          <h3 className="mb-3 text-lg font-black">写真投稿</h3>
+          <div className="grid gap-3">
+            {state.submissions.length === 0 && <p className="text-sm text-slate-400">まだ投稿がありません。</p>}
+            {state.submissions.slice(0, 8).map((submission) => {
+              const mission = state.missions.find((candidate) => candidate.id === submission.missionId);
+              const team = state.teams.find((candidate) => candidate.id === submission.teamId);
+              const imageUrls = submission.imageUrls ?? [submission.imageUrl].filter(Boolean);
+              return (
+                <div key={submission.id} className="rounded-md border border-reef/10 bg-white/80 p-2">
+                  <p className="text-sm font-black text-ink">{mission?.title ?? "ミッション"} / {team?.name ?? "チーム"}</p>
+                  <div className="mt-2 grid grid-cols-3 gap-2">
+                    {imageUrls.slice(0, 6).map((url) => (
+                      <img key={url} src={url} alt="" className="aspect-square w-full rounded-md object-cover" />
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </Card>
 
         <PwaNotice />
