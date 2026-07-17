@@ -76,6 +76,41 @@ textarea {
   animation: judgment-lines 0.52s linear infinite;
 }
 
+.avatar-atmosphere {
+  mix-blend-mode: multiply;
+}
+
+.avatar-floater {
+  opacity: 0.16;
+  animation: avatar-float 18s ease-in-out infinite alternate;
+}
+
+.avatar-intro {
+  animation: avatar-intro-fade 3.4s ease both;
+}
+
+.avatar-intro-grid {
+  background:
+    radial-gradient(circle at 50% 46%, rgba(0, 191, 214, 0.16), transparent 32%),
+    radial-gradient(circle at 42% 54%, rgba(255, 43, 147, 0.14), transparent 26%),
+    linear-gradient(rgba(67, 54, 130, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(67, 54, 130, 0.08) 1px, transparent 1px);
+  background-size: auto, auto, 28px 28px, 28px 28px;
+}
+
+.avatar-intro-core {
+  animation: avatar-core-in 0.42s cubic-bezier(0.2, 0.95, 0.24, 1.1) both;
+}
+
+.avatar-intro-face {
+  opacity: 0;
+  animation: avatar-face-in 0.58s cubic-bezier(0.22, 1.25, 0.28, 1) both;
+}
+
+.avatar-intro-badge {
+  animation: avatar-badge-pulse 1.2s ease-in-out infinite alternate;
+}
+
 @keyframes emergency-fade {
   0% { opacity: 0; }
   6%, 88% { opacity: 1; }
@@ -123,6 +158,33 @@ textarea {
   to { transform: translateX(-34px); }
 }
 
+@keyframes avatar-float {
+  0% { transform: translate3d(-8px, -10px, 0) rotate(-5deg) scale(0.96); }
+  50% { transform: translate3d(8px, 12px, 0) rotate(5deg) scale(1.04); }
+  100% { transform: translate3d(14px, -6px, 0) rotate(-2deg) scale(1); }
+}
+
+@keyframes avatar-intro-fade {
+  0% { opacity: 0; }
+  8%, 82% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes avatar-core-in {
+  from { opacity: 0; transform: translateY(18px) scale(0.9); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes avatar-face-in {
+  0% { opacity: 0; filter: blur(4px); }
+  100% { opacity: 1; filter: blur(0); }
+}
+
+@keyframes avatar-badge-pulse {
+  from { transform: scale(0.98); filter: saturate(0.95); }
+  to { transform: scale(1.04); filter: saturate(1.18); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .emergency-overlay,
   .emergency-panel,
@@ -132,7 +194,16 @@ textarea {
   .judgment-overlay,
   .judgment-card,
   .judgment-stamp,
-  .judgment-speedline {
+  .judgment-speedline,
+  .avatar-floater,
+  .avatar-intro,
+  .avatar-intro-core,
+  .avatar-intro-face,
+  .avatar-intro-badge {
     animation: none;
+  }
+
+  .avatar-atmosphere {
+    display: none;
   }
 }

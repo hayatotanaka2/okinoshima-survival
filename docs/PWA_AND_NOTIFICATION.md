@@ -18,6 +18,7 @@
 - public/icon-512.png を参照する。
 - service workerを用意する。
 - iPhoneのホーム画面に追加できる構成にする。
+- 起動時演出は短くし、localStorageで表示頻度を抑える。
 
 ## 3. iPhoneでの使い方
 

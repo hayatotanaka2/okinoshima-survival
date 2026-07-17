@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
+import { AvatarAtmosphere } from "@/components/AvatarAtmosphere";
+import { AvatarIntro } from "@/components/AvatarIntro";
 import { EmergencyMissionAlert } from "@/components/EmergencyMissionAlert";
 import { JudgmentAlert } from "@/components/JudgmentAlert";
 import "./globals.css";
@@ -26,7 +28,9 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
   return (
     <html lang="ja">
       <body>
+        <AvatarAtmosphere />
         {children}
+        <AvatarIntro />
         <EmergencyMissionAlert />
         <JudgmentAlert />
       </body>
