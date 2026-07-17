@@ -7,12 +7,16 @@ import { JudgmentAlert } from "@/components/JudgmentAlert";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "沖ノ島サバイバル",
-  description: "同期旅行で使う沖ノ島サバイバルゲームPWA",
+  title: "僕らのサマーウォーズ ver-B",
+  description: "同期旅行で使うイベントPWA",
   manifest: "/manifest.json",
+  icons: {
+    icon: "/clock.jpeg",
+    apple: "/clock.jpeg",
+  },
   appleWebApp: {
     capable: true,
-    title: "沖サバ",
+    title: "僕らのサマーウォーズ ver-B",
     statusBarStyle: "default",
   },
 };

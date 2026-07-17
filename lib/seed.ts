@@ -155,7 +155,7 @@ export const createInitialGameState = (): GameState => ({
   eventLogs: [
     {
       id: "log-1",
-      message: "沖ノ島サバイバルの準備ができました。",
+      message: "僕らのサマーウォーズ ver-Bの準備ができました。",
       type: "system",
       createdAt: now,
     },

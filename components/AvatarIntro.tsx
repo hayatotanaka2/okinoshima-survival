@@ -28,10 +28,10 @@ export function AvatarIntro() {
   const featured = avatarAssets.slice(0, 12);
 
   return (
-    <div className="avatar-intro fixed inset-0 z-[70] grid place-items-center overflow-hidden bg-white/95 px-4" role="dialog" aria-modal="true" aria-label="沖ノ島サバイバル起動">
+    <div className="avatar-intro fixed inset-0 z-[70] grid place-items-center overflow-hidden bg-white/95 px-4" role="dialog" aria-modal="true" aria-label="僕らのサマーウォーズ ver-B起動">
       <div className="avatar-intro-grid absolute inset-0 opacity-70" />
       <div className="absolute inset-x-0 top-[16%] flex justify-center text-[10px] font-black tracking-[0.45em] text-reef">
-        OKINOSHIMA SURVIVAL
+        BOKURA SUMMER WARS
       </div>
       <section className="avatar-intro-core relative z-10 w-full max-w-sm text-center">
         <div className="relative mx-auto grid h-52 w-52 place-items-center">
@@ -57,13 +57,13 @@ export function AvatarIntro() {
             <div className="grid h-full w-full place-items-center rounded-full bg-white text-center">
               <div>
                 <p className="text-xs font-black text-reef">SYNC</p>
-                <p className="text-xl font-black text-ink">沖サバ</p>
+                <p className="text-xl font-black text-ink">ver-B</p>
               </div>
             </div>
           </div>
         </div>
         <h2 className="mt-4 text-3xl font-black text-ink">メンバー接続中</h2>
-        <p className="mt-2 text-sm font-bold text-slate-300">沖ノ島サバイバルを起動しています</p>
+        <p className="mt-2 text-sm font-bold text-slate-300">僕らのサマーウォーズ ver-Bを起動しています</p>
         <button className="mt-5 min-h-11 rounded-md bg-ember px-6 py-2 text-sm font-black text-white shadow-[0_12px_30px_rgba(255,43,147,0.25)]" onClick={() => setVisible(false)}>
           はじめる
         </button>

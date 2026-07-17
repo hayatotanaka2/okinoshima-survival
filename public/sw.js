@@ -1,5 +1,5 @@
-const CACHE_NAME = "okinoshima-survival-v1";
-const APP_SHELL = ["/", "/manifest.json", "/icon.svg"];
+const CACHE_NAME = "bokura-summer-wars-ver-b-v2";
+const APP_SHELL = ["/", "/manifest.json", "/clock.jpeg"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)));
@@ -24,7 +24,7 @@ self.addEventListener("fetch", (event) => {
 
 self.addEventListener("push", (event) => {
   const fallback = {
-    title: "沖ノ島サバイバル",
+    title: "僕らのサマーウォーズ ver-B",
     body: "新しい通知があります。",
     url: "/",
   };
@@ -33,8 +33,8 @@ self.addEventListener("push", (event) => {
   const title = data.title || fallback.title;
   const options = {
     body: data.body || fallback.body,
-    icon: "/icon.svg",
-    badge: "/icon.svg",
+    icon: "/clock.jpeg",
+    badge: "/clock.jpeg",
     data: {
       url: data.url || fallback.url,
     },

@@ -25,7 +25,7 @@ export default function HomePage() {
   const { state } = useGameState();
   const { selectedMember } = useSelectedMember(state);
 
-  if (!state) return <Shell title="沖ノ島サバイバル"><p>読み込み中...</p></Shell>;
+  if (!state) return <Shell title="僕らのサマーウォーズ ver-B"><p>読み込み中...</p></Shell>;
 
   return (
     <Shell>
@@ -34,7 +34,7 @@ export default function HomePage() {
           <div className="absolute -right-5 -top-8 h-28 w-28 rounded-full border-[12px] border-lagoon/35 border-b-ember/40 border-l-lime/50" />
           <div className="absolute right-12 top-20 h-3 w-3 rounded-full bg-sun" />
           <p className="relative text-sm font-black text-reef">SYNC TRIP EVENT</p>
-          <h2 className="relative mt-1 text-3xl font-black tracking-normal text-ink">沖ノ島サバイバル</h2>
+          <h2 className="relative mt-1 text-3xl font-black tracking-normal text-ink">僕らのサマーウォーズ ver-B</h2>
           <p className="mt-3 text-sm leading-6 text-slate-300">
             ミッション、物資、沖コイン、オークションで旅行を丸ごとゲーム化します。
           </p>

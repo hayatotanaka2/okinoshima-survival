@@ -1,4 +1,4 @@
--- 沖ノ島サバイバル MVP Supabase setup
+-- 僕らのサマーウォーズ ver-B MVP Supabase setup
 -- Supabase Dashboard > SQL Editor でこのSQLを実行してください。
 
 create table if not exists public.game_states (

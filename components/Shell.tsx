@@ -20,8 +20,8 @@ export function Shell({ children, title }: { children: ReactNode; title?: string
         <div className="flex items-center gap-3">
           <span className="grid h-9 w-9 place-items-center rounded-full bg-gradient-to-br from-lagoon via-lime to-sun text-sm font-black text-ink shadow-sm">O</span>
           <div>
-            <p className="text-xs font-black text-reef">OKINOSHIMA SURVIVAL</p>
-            <h1 className="text-xl font-black tracking-normal text-ink">{title ?? "沖ノ島サバイバル"}</h1>
+            <p className="text-xs font-black text-reef">BOKURA SUMMER WARS</p>
+            <h1 className="text-xl font-black tracking-normal text-ink">{title ?? "僕らのサマーウォーズ ver-B"}</h1>
           </div>
           <HeaderPlayerButton />
         </div>

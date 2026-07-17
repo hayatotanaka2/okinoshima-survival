@@ -9,13 +9,12 @@
 ## 2. PWA要件
 
 - public/manifest.json を作成する。
-- name は「沖ノ島サバイバル」。
-- short_name は「沖サバ」。
+- name は「僕らのサマーウォーズ ver-B」。
+- short_name は「ver-B」。
 - display は standalone。
 - theme_color を設定する。
 - background_color を設定する。
-- public/icon-192.png を参照する。
-- public/icon-512.png を参照する。
+- ホーム画面アイコンは public/clock.jpeg を参照する。
 - service workerを用意する。
 - iPhoneのホーム画面に追加できる構成にする。
 - 起動時演出は短くし、localStorageで表示頻度を抑える。
