@@ -3,8 +3,6 @@
 import { useEffect, useState } from "react";
 import { avatarAssets } from "@/lib/avatarAssets";
 
-const INTRO_KEY = "okinoshima-avatar-intro-shown-at";
-const INTRO_INTERVAL_MS = 12 * 60 * 60 * 1000;
 const INTRO_DURATION_MS = 3400;
 
 export function AvatarIntro() {
@@ -14,11 +12,7 @@ export function AvatarIntro() {
     if (typeof window === "undefined") return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    const lastShown = Number(window.localStorage.getItem(INTRO_KEY) ?? 0);
-    if (Date.now() - lastShown < INTRO_INTERVAL_MS) return;
-
     setVisible(true);
-    window.localStorage.setItem(INTRO_KEY, String(Date.now()));
     const timer = window.setTimeout(() => setVisible(false), INTRO_DURATION_MS);
     return () => window.clearTimeout(timer);
   }, []);

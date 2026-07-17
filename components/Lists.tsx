@@ -1,6 +1,5 @@
 import { calculateTeamCoin } from "@/lib/teamLogic";
 import type { AppNotification, EventLog, GameState, Team } from "@/lib/types";
-import { Card } from "./Cards";
 
 export function TeamRow({ team, state }: { team: Team; state: GameState }) {
   return (
@@ -39,10 +38,17 @@ export function NotificationList({ notifications, limit = 4 }: { notifications: 
       {notifications.slice(0, limit).map((notice) => {
         const isEmergency = notice.type === "mission" && (notice.title.includes("緊急") || notice.body.includes("緊急"));
         return (
-        <Card key={notice.id} className={`p-3 ${isEmergency ? "border-ember bg-ember text-white shadow-[0_12px_28px_rgba(255,43,147,0.26)]" : ""}`}>
-          <p className={`text-sm font-black ${isEmergency ? "text-white" : "text-ember"}`}>{notice.title}</p>
-          <p className={`mt-1 text-sm ${isEmergency ? "text-white" : "text-slate-200"}`}>{notice.body}</p>
-        </Card>
+          <div
+            key={notice.id}
+            className={`rounded-md border p-3 shadow-glow ${
+              isEmergency
+                ? "border-ember bg-ember text-white shadow-[0_12px_28px_rgba(255,43,147,0.26)]"
+                : "border-reef/15 bg-white/90 text-ink"
+            }`}
+          >
+            <p className={`text-sm font-black ${isEmergency ? "text-white" : "text-ember"}`}>{notice.title}</p>
+            <p className={`mt-1 text-sm ${isEmergency ? "text-white" : "text-slate-200"}`}>{notice.body}</p>
+          </div>
         );
       })}
     </div>

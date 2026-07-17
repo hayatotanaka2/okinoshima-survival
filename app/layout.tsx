@@ -4,6 +4,7 @@ import { AvatarAtmosphere } from "@/components/AvatarAtmosphere";
 import { AvatarIntro } from "@/components/AvatarIntro";
 import { EmergencyMissionAlert } from "@/components/EmergencyMissionAlert";
 import { JudgmentAlert } from "@/components/JudgmentAlert";
+import { MissionCompletionAlert } from "@/components/MissionCompletionAlert";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -36,6 +37,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
         {children}
         <AvatarIntro />
         <EmergencyMissionAlert />
+        <MissionCompletionAlert />
         <JudgmentAlert />
       </body>
     </html>
