@@ -12,6 +12,7 @@ export default function ItemsPage() {
   if (!state) return <Shell title="物資"><p>読み込み中...</p></Shell>;
 
   const actor = selectedMember;
+  const visibleItems = actor ? state.items.filter((item) => item.ownerMemberId === actor.id) : [];
 
   return (
     <Shell title="物資">
@@ -29,30 +30,46 @@ export default function ItemsPage() {
           <p className="mt-2 text-sm text-slate-400">この選択は端末に保存されます。自分の所有物資を使用できます。</p>
         </Card>
 
-        {state.items.map((item) => {
+        {!actor && <Card>自分の名前を選択すると、所持している物資・カードが表示されます。</Card>}
+        {actor && visibleItems.length === 0 && <Card>所持している物資・カードはまだありません。</Card>}
+
+        {visibleItems.map((item) => {
           const ownerMember = state.members.find((member) => member.id === item.ownerMemberId);
           const ownerTeam = state.teams.find((team) => team.id === item.ownerTeamId);
+          const used = item.status === "used";
           const canUse =
             actor &&
             item.status === "owned" &&
             item.ownerMemberId === actor.id;
           return (
-            <Card key={item.id}>
-              <div className="flex items-start justify-between gap-3">
-                <h2 className="text-lg font-black">{item.name}</h2>
-                <span className="rounded-md bg-violet-50 px-2 py-1 text-xs font-bold text-reef">{item.status}</span>
-              </div>
-              <p className="mt-2 text-sm leading-6 text-slate-300">{item.description}</p>
-              <p className="mt-3 text-sm text-lagoon">価値: {item.value}沖</p>
-              <p className="mt-1 text-sm text-slate-400">種類: {item.type}</p>
-              <p className="mt-1 text-sm text-slate-400">所有者: {ownerMember?.name ?? ownerTeam?.name ?? "未取得"}</p>
-              <div className="mt-3">
-                <PrimaryButton
-                  disabled={!canUse}
-                  onClick={() => actor && updateState((current) => useItem(current, item.id, actor.name))}
-                >
-                  使用する
-                </PrimaryButton>
+            <Card key={item.id} className={`relative overflow-hidden ${used ? "bg-slate-100 opacity-70" : ""}`}>
+              {used && (
+                <>
+                  <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,transparent_47%,rgba(255,43,147,0.7)_48%,rgba(255,43,147,0.7)_52%,transparent_53%)]" />
+                  <div className="pointer-events-none absolute inset-0 grid place-items-center">
+                    <div className="-rotate-12 rounded-md border-4 border-ember bg-white/90 px-5 py-2 text-2xl font-black text-ember shadow-lg">
+                      使用済み
+                    </div>
+                  </div>
+                </>
+              )}
+              <div className={`relative ${used ? "grayscale" : ""}`}>
+                <div className="flex items-start justify-between gap-3">
+                  <h2 className="text-lg font-black">{item.name}</h2>
+                  <span className={`rounded-md px-2 py-1 text-xs font-bold ${used ? "bg-slate-200 text-slate-500" : "bg-violet-50 text-reef"}`}>
+                    {used ? "使用不可" : "所持中"}
+                  </span>
+                </div>
+                <p className="mt-2 text-sm leading-6 text-slate-300">{item.description}</p>
+                <p className="mt-3 text-sm text-slate-400">所有者: {ownerMember?.name ?? ownerTeam?.name ?? "未取得"}</p>
+                <div className="mt-3">
+                  <PrimaryButton
+                    disabled={!canUse}
+                    onClick={() => actor && updateState((current) => useItem(current, item.id, actor.name))}
+                  >
+                    使用する
+                  </PrimaryButton>
+                </div>
               </div>
             </Card>
           );

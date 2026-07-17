@@ -14,7 +14,7 @@ import { applyRankingRewards, approveMissionSubmission, completeMissionForTeam, 
 import { addTeam, applyTeamDraft, buildRandomTeams, calculateTeamCoin, deleteTeam, moveMemberToTeam, updateTeam } from "@/lib/teamLogic";
 import { isSupabaseConfigured } from "@/lib/supabaseClient";
 import { useGameState } from "@/lib/useGameState";
-import type { GameState, ItemType, MissionCategory, MissionDifficulty, MissionRequirement, MissionRewardKind, MissionRewardMode, MissionTargetType, Team, Treasure } from "@/lib/types";
+import type { GameState, MissionCategory, MissionDifficulty, MissionRequirement, MissionRewardKind, MissionRewardMode, MissionTargetType, Team, Treasure } from "@/lib/types";
 
 export default function AdminPage() {
   const { state, updateState, reset } = useGameState();
@@ -46,12 +46,10 @@ export default function AdminPage() {
   const [missionRewardMode, setMissionRewardMode] = useState<MissionRewardMode>("same");
   const [missionRewardItemName, setMissionRewardItemName] = useState("");
   const [missionRewardItemDescription, setMissionRewardItemDescription] = useState("");
-  const [missionRewardItemType, setMissionRewardItemType] = useState<ItemType>("privilege");
-  const [missionRewardItemValue, setMissionRewardItemValue] = useState(500);
   const [rankingRewards, setRankingRewards] = useState([
-    { rank: 1, rewardKind: "coin" as MissionRewardKind, rewardCoin: 1000, rewardItemName: "", rewardItemDescription: "", rewardItemType: "privilege" as ItemType, rewardItemValue: 1000 },
-    { rank: 2, rewardKind: "coin" as MissionRewardKind, rewardCoin: 600, rewardItemName: "", rewardItemDescription: "", rewardItemType: "privilege" as ItemType, rewardItemValue: 600 },
-    { rank: 3, rewardKind: "coin" as MissionRewardKind, rewardCoin: 300, rewardItemName: "", rewardItemDescription: "", rewardItemType: "privilege" as ItemType, rewardItemValue: 300 },
+    { rank: 1, rewardKind: "coin" as MissionRewardKind, rewardCoin: 1000, rewardItemName: "", rewardItemDescription: "" },
+    { rank: 2, rewardKind: "coin" as MissionRewardKind, rewardCoin: 600, rewardItemName: "", rewardItemDescription: "" },
+    { rank: 3, rewardKind: "coin" as MissionRewardKind, rewardCoin: 300, rewardItemName: "", rewardItemDescription: "" },
   ]);
   const [editMissionId, setEditMissionId] = useState("");
   const [rankingMissionId, setRankingMissionId] = useState("");
@@ -166,8 +164,8 @@ export default function AdminPage() {
           ? {
               name: missionRewardItemName,
               description: missionRewardItemDescription,
-              type: missionRewardItemType,
-              value: missionRewardItemValue,
+              type: "privilege",
+              value: 0,
             }
           : undefined,
         rankingRewards: rankingRewards.map((reward) => ({
@@ -178,8 +176,8 @@ export default function AdminPage() {
             ? {
                 name: reward.rewardItemName,
                 description: reward.rewardItemDescription,
-                type: reward.rewardItemType,
-                value: reward.rewardItemValue,
+                type: "privilege",
+                value: 0,
               }
             : undefined,
         })),
@@ -213,8 +211,8 @@ export default function AdminPage() {
           ? {
               name: missionRewardItemName,
               description: missionRewardItemDescription,
-              type: missionRewardItemType,
-              value: missionRewardItemValue,
+              type: "privilege",
+              value: 0,
             }
           : undefined,
         rankingRewards: rankingRewards.map((reward) => ({
@@ -225,8 +223,8 @@ export default function AdminPage() {
             ? {
                 name: reward.rewardItemName,
                 description: reward.rewardItemDescription,
-                type: reward.rewardItemType,
-                value: reward.rewardItemValue,
+                type: "privilege",
+                value: 0,
               }
             : undefined,
         })),
@@ -457,8 +455,6 @@ export default function AdminPage() {
                 rewardMode={missionRewardMode}
                 rewardItemName={missionRewardItemName}
                 rewardItemDescription={missionRewardItemDescription}
-                rewardItemType={missionRewardItemType}
-                rewardItemValue={missionRewardItemValue}
                 rankingRewards={rankingRewards}
                 setTitle={setMissionTitle}
                 setDescription={setMissionDescription}
@@ -474,8 +470,6 @@ export default function AdminPage() {
                 setRewardMode={setMissionRewardMode}
                 setRewardItemName={setMissionRewardItemName}
                 setRewardItemDescription={setMissionRewardItemDescription}
-                setRewardItemType={setMissionRewardItemType}
-                setRewardItemValue={setMissionRewardItemValue}
                 setRankingRewards={setRankingRewards}
               />
               <PrimaryButton type="submit" disabled={!missionTitle.trim() || (missionRewardKind === "item" && !missionRewardItemName.trim())}>作成して発令</PrimaryButton>
@@ -501,8 +495,6 @@ export default function AdminPage() {
                   setMissionRewardMode(mission?.rewardMode ?? "same");
                   setMissionRewardItemName(mission?.rewardItem?.name ?? "");
                   setMissionRewardItemDescription(mission?.rewardItem?.description ?? "");
-                  setMissionRewardItemType(mission?.rewardItem?.type ?? "privilege");
-                  setMissionRewardItemValue(mission?.rewardItem?.value ?? 500);
                   if (mission?.rankingRewards?.length) {
                     setRankingRewards([1, 2, 3].map((rank) => {
                       const reward = mission.rankingRewards?.find((candidate) => candidate.rank === rank);
@@ -512,8 +504,6 @@ export default function AdminPage() {
                         rewardCoin: reward?.rewardCoin ?? 0,
                         rewardItemName: reward?.rewardItem?.name ?? "",
                         rewardItemDescription: reward?.rewardItem?.description ?? "",
-                        rewardItemType: reward?.rewardItem?.type ?? "privilege",
-                        rewardItemValue: reward?.rewardItem?.value ?? 0,
                       };
                     }));
                   }
@@ -774,8 +764,6 @@ function MissionFields({
   rewardMode,
   rewardItemName,
   rewardItemDescription,
-  rewardItemType,
-  rewardItemValue,
   rankingRewards,
   setTitle,
   setDescription,
@@ -791,8 +779,6 @@ function MissionFields({
   setRewardMode,
   setRewardItemName,
   setRewardItemDescription,
-  setRewardItemType,
-  setRewardItemValue,
   setRankingRewards,
 }: {
   title: string;
@@ -809,9 +795,7 @@ function MissionFields({
   rewardMode: MissionRewardMode;
   rewardItemName: string;
   rewardItemDescription: string;
-  rewardItemType: ItemType;
-  rewardItemValue: number;
-  rankingRewards: Array<{ rank: number; rewardKind: MissionRewardKind; rewardCoin: number; rewardItemName: string; rewardItemDescription: string; rewardItemType: ItemType; rewardItemValue: number }>;
+  rankingRewards: Array<{ rank: number; rewardKind: MissionRewardKind; rewardCoin: number; rewardItemName: string; rewardItemDescription: string }>;
   setTitle: (value: string) => void;
   setDescription: (value: string) => void;
   setRewardCoin: (value: number) => void;
@@ -826,9 +810,7 @@ function MissionFields({
   setRewardMode: (value: MissionRewardMode) => void;
   setRewardItemName: (value: string) => void;
   setRewardItemDescription: (value: string) => void;
-  setRewardItemType: (value: ItemType) => void;
-  setRewardItemValue: (value: number) => void;
-  setRankingRewards: (value: Array<{ rank: number; rewardKind: MissionRewardKind; rewardCoin: number; rewardItemName: string; rewardItemDescription: string; rewardItemType: ItemType; rewardItemValue: number }>) => void;
+  setRankingRewards: (value: Array<{ rank: number; rewardKind: MissionRewardKind; rewardCoin: number; rewardItemName: string; rewardItemDescription: string }>) => void;
 }) {
   const forcedRequired = category === "emergency-treasure" || category === "emergency-battle";
   const codeRequired = requiresCode || category === "emergency-treasure";
@@ -906,25 +888,6 @@ function MissionFields({
             カード説明
             <textarea className={inputClass} value={rewardItemDescription} onChange={(event) => setRewardItemDescription(event.target.value)} />
           </Field>
-          <div className="grid grid-cols-2 gap-2">
-            <Field>
-              種類
-              <select className={inputClass} value={rewardItemType} onChange={(event) => setRewardItemType(event.target.value as ItemType)}>
-                <option value="privilege">特典</option>
-                <option value="hint">ヒント</option>
-                <option value="defense">防御</option>
-                <option value="civilization">文明</option>
-                <option value="sabotage">妨害</option>
-                <option value="food">食べ物</option>
-                <option value="drink">飲み物</option>
-                <option value="other">その他</option>
-              </select>
-            </Field>
-            <Field>
-              価値
-              <input className={inputClass} type="number" value={rewardItemValue} onChange={(event) => setRewardItemValue(Number(event.target.value))} />
-            </Field>
-          </div>
         </div>
       )}
       <input type="hidden" value={difficulty} onChange={(event) => setDifficulty(event.target.value as MissionDifficulty)} />

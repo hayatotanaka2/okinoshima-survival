@@ -36,6 +36,7 @@ export default function MissionsPage() {
   if (!state) return <Shell title="ミッション"><p>読み込み中...</p></Shell>;
 
   const currentTeam = state.teams.find((team) => team.id === selectedMember?.currentTeamId);
+  const visibleMissions = state.missions.filter((mission) => mission.status !== "draft");
 
   async function submitPhotos(event: FormEvent, mission: Mission) {
     event.preventDefault();
@@ -78,7 +79,8 @@ export default function MissionsPage() {
   return (
     <Shell title="ミッション">
       <div className="grid gap-3">
-        {state.missions.map((mission) => {
+        {visibleMissions.length === 0 && <Card>発動中のミッションはまだありません。</Card>}
+        {visibleMissions.map((mission) => {
           const completedTeams = state.teams.filter((team) => isMissionCompletedByTeam(mission, team));
           const completedByMyTeam = isMissionCompletedByTeam(mission, currentTeam);
           const canAct = mission.status === "active" && currentTeam && selectedMember && !completedByMyTeam;
