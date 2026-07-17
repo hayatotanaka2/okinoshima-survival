@@ -48,7 +48,14 @@ export function normalizeGameState(state: GameState): GameState {
   });
   const missions = (state.missions ?? []).map((mission) => ({
     ...mission,
-    completedTeamRecords: mission.completedTeamRecords ?? [],
+    status: mission.status === "completed" ? ("active" as const) : mission.status,
+    completedTeamRecords:
+      mission.completedTeamRecords?.length
+        ? mission.completedTeamRecords
+        : (mission.completedByTeamIds ?? []).map((teamId) => ({
+            teamId,
+            completedAt: mission.updatedAt,
+          })),
   }));
 
   const membersWithItems = members.map((member) => {

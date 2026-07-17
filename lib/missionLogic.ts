@@ -1,6 +1,6 @@
 import { distributeRewardToTeam } from "./coinLogic";
 import { addEventLog, addNotification, uid } from "./gameLogic";
-import type { GameState, Mission, MissionDifficulty, MissionStatus, MissionSubmission, MissionTargetType } from "./types";
+import type { GameState, Mission, MissionDifficulty, MissionStatus, MissionSubmission, MissionTargetType, Team } from "./types";
 
 export type MissionInput = {
   title: string;
@@ -50,6 +50,13 @@ export function updateMission(state: GameState, missionId: string, input: Missio
   return addEventLog({ ...state, missions }, `ミッション「${mission.title}」を編集しました。`, "mission");
 }
 
+export function isMissionCompletedByTeam(mission: Mission, team?: Team): boolean {
+  if (!team) return false;
+  return (mission.completedTeamRecords ?? []).some(
+    (record) => record.teamId === team.id && record.completedAt >= team.createdAt,
+  );
+}
+
 export function deleteMission(state: GameState, missionId: string): GameState {
   const mission = state.missions.find((candidate) => candidate.id === missionId);
   if (!mission) return state;
@@ -83,16 +90,12 @@ export function completeMissionForTeam(state: GameState, missionId: string, team
   const mission = state.missions.find((candidate) => candidate.id === missionId);
   const team = state.teams.find((candidate) => candidate.id === teamId);
   if (!mission || !team) return state;
-  const alreadyCompletedByCurrentTeam = (mission.completedTeamRecords ?? []).some(
-    (record) => record.teamId === teamId && record.completedAt >= team.createdAt,
-  );
-  if (alreadyCompletedByCurrentTeam) return state;
+  if (isMissionCompletedByTeam(mission, team)) return state;
 
   const missions = state.missions.map((candidate) =>
     candidate.id === missionId
       ? {
           ...candidate,
-          status: "completed" as const,
           completedByTeamIds: Array.from(new Set([...candidate.completedByTeamIds, teamId])),
           completedTeamRecords: [
             ...(candidate.completedTeamRecords ?? []),
@@ -103,9 +106,11 @@ export function completeMissionForTeam(state: GameState, missionId: string, team
       : candidate,
   );
 
+  const rewardPerMember = team.memberIds.length > 0 ? Math.floor(mission.rewardCoin / team.memberIds.length) : 0;
   let next = distributeRewardToTeam({ ...state, missions }, teamId, mission.rewardCoin);
-  next = addEventLog(next, `${team.name}が「${mission.title}」を達成しました。`, "mission");
-  next = addNotification(next, "ミッション達成", `${team.name}が「${mission.title}」を達成！`, "mission");
+  const message = `${team.name}がミッション「${mission.title}」を達成しました。各メンバーに${rewardPerMember}沖コインを配布しました。`;
+  next = addEventLog(next, message, "mission");
+  next = addNotification(next, "ミッション達成", message, "mission");
   return next;
 }
 
@@ -122,6 +127,7 @@ export function createMissionSubmission(state: GameState, input: MissionSubmissi
   const team = state.teams.find((candidate) => candidate.id === input.teamId);
   const member = state.members.find((candidate) => candidate.id === input.submittedByMemberId);
   if (!mission || !team || !member || !input.imageUrl) return state;
+  if (mission.status !== "active" || isMissionCompletedByTeam(mission, team)) return state;
 
   const submission: MissionSubmission = {
     id: uid("submission"),

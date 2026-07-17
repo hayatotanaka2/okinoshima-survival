@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { Card, Field, PrimaryButton, inputClass } from "@/components/Cards";
 import { Shell } from "@/components/Shell";
-import { createMissionSubmission } from "@/lib/missionLogic";
+import { createMissionSubmission, isMissionCompletedByTeam } from "@/lib/missionLogic";
 import { uploadMissionPhoto } from "@/lib/photoStorage";
 import { useGameState } from "@/lib/useGameState";
 import { useSelectedMember } from "@/lib/useSelectedMember";
@@ -25,6 +25,12 @@ export default function SubmissionsPage() {
   }, [memberId, selectedMember, selectedMemberId, teamId]);
 
   if (!state) return <Shell title="写真投稿"><p>読み込み中...</p></Shell>;
+
+  const selectedTeam = state.teams.find((team) => team.id === teamId);
+  const activeMissions = state.missions.filter(
+    (mission) => mission.status === "active" && !isMissionCompletedByTeam(mission, selectedTeam),
+  );
+  const canSubmitSelectedMission = activeMissions.some((mission) => mission.id === missionId);
 
   async function submit(event: FormEvent) {
     event.preventDefault();
@@ -61,7 +67,7 @@ export default function SubmissionsPage() {
               ミッション
               <select className={inputClass} value={missionId} onChange={(event) => setMissionId(event.target.value)}>
                 <option value="">選択してください</option>
-                {state.missions.map((mission) => (
+                {activeMissions.map((mission) => (
                   <option key={mission.id} value={mission.id}>{mission.title}</option>
                 ))}
               </select>
@@ -107,9 +113,10 @@ export default function SubmissionsPage() {
               コメント
               <textarea className={inputClass} value={comment} onChange={(event) => setComment(event.target.value)} />
             </Field>
-            <PrimaryButton type="submit" disabled={!missionId || !teamId || !memberId || !file || uploading}>
+            <PrimaryButton type="submit" disabled={!missionId || !canSubmitSelectedMission || !teamId || !memberId || !file || uploading}>
               {uploading ? "投稿中..." : "写真を投稿する"}
             </PrimaryButton>
+            {activeMissions.length === 0 && <p className="text-sm text-slate-400">このチームが提出できる発動中ミッションはありません。</p>}
             {message && <p className="text-sm text-lagoon">{message}</p>}
           </form>
         </Card>

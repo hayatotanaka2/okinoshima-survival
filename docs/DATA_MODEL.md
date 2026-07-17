@@ -134,6 +134,8 @@ type Item = {
 
 ミッション達成は `completedTeamRecords` に時刻付きで保存します。チームタブでは、現在のチーム作成日時以降に達成されたミッションだけを表示します。
 
+MVPでは、ミッション全体の `status` は `active` または `closed` を主に使います。チームが達成してもミッション全体は `completed` にせず、達成チームだけを `completedTeamRecords` に追加します。
+
 ## 7. AuctionItem
 
 ```ts
