@@ -127,7 +127,7 @@ textarea {
   background:
     radial-gradient(circle at 50% 50%, rgba(255, 43, 147, 0.18), transparent 26%),
     conic-gradient(from 0deg, rgba(0, 191, 214, 0.16), transparent 10deg, rgba(201, 255, 93, 0.22) 18deg, transparent 30deg);
-  animation: mission-complete-rays 1.8s linear infinite;
+  animation: mission-complete-rays 5.4s linear both;
 }
 
 @keyframes emergency-fade {
@@ -223,7 +223,8 @@ textarea {
 }
 
 @keyframes mission-complete-rays {
-  to { transform: rotate(360deg); }
+  from { transform: rotate(0deg) scale(1); }
+  to { transform: rotate(360deg) scale(1.08); }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useGameState } from "@/lib/useGameState";
 import { useSelectedMember } from "@/lib/useSelectedMember";
 import type { Mission, MissionTeamCompletion, Team } from "@/lib/types";
@@ -21,6 +21,7 @@ export function MissionCompletionAlert() {
   const { state } = useGameState();
   const { selectedMember } = useSelectedMember(state);
   const [target, setTarget] = useState<CompletionTarget | null>(null);
+  const sessionSeenKeys = useRef(new Set<string>());
 
   const nextTarget = useMemo(() => {
     if (!state || !selectedMember?.currentTeamId || typeof window === "undefined") return null;
@@ -35,11 +36,19 @@ export function MissionCompletionAlert() {
 
     return candidates
       .sort((a, b) => Date.parse(b.record.completedAt) - Date.parse(a.record.completedAt))
-      .find((candidate) => !window.localStorage.getItem(seenKey(candidate))) ?? null;
+      .find((candidate) => {
+        const key = seenKey(candidate);
+        return !sessionSeenKeys.current.has(key) && !window.localStorage.getItem(key);
+      }) ?? null;
   }, [selectedMember, state]);
 
   useEffect(() => {
-    if (!target && nextTarget) setTarget(nextTarget);
+    if (!target && nextTarget) {
+      const key = seenKey(nextTarget);
+      sessionSeenKeys.current.add(key);
+      window.localStorage.setItem(key, "1");
+      setTarget(nextTarget);
+    }
   }, [nextTarget, target]);
 
   useEffect(() => {
@@ -49,7 +58,9 @@ export function MissionCompletionAlert() {
   }, [target]);
 
   function dismiss(current: CompletionTarget) {
-    window.localStorage.setItem(seenKey(current), "1");
+    const key = seenKey(current);
+    sessionSeenKeys.current.add(key);
+    window.localStorage.setItem(key, "1");
     setTarget(null);
   }
 
