@@ -16,6 +16,7 @@ type GameState = {
   items: Item[];
   auctionItems: AuctionItem[];
   treasures: Treasure[];
+  moraleReports: MoraleReport[];
   eventLogs: EventLog[];
   notifications: AppNotification[];
   gameStatus: GameStatus;
@@ -237,6 +238,26 @@ type AppNotification = {
 ```
 
 MVPではアプリ内通知としてGameStateに保存します。Supabase設定済みなら全端末に同期されます。
+
+## 10.1 MoraleReport
+
+```ts
+type MoraleVerdict = "pending" | "guilty" | "not_guilty";
+
+type MoraleReport = {
+  id: string;
+  accusedMemberId: string;
+  accuserMemberId?: string;
+  content: string;
+  verdict: MoraleVerdict;
+  verdictReason?: string;
+  judgedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+```
+
+士気掲示板の告発を表します。判決が `guilty` または `not_guilty` になった時、全端末で判決エフェクトを表示します。
 
 ## 11. GameStatus
 

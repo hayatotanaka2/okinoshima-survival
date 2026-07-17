@@ -153,6 +153,7 @@ export type EventLogType =
   | "auction"
   | "coin"
   | "treasure"
+  | "morale"
   | "system"
   | "notification";
 
@@ -183,7 +184,22 @@ export type NotificationType =
   | "item"
   | "auction"
   | "treasure"
+  | "morale"
   | "system";
+
+export type MoraleVerdict = "pending" | "guilty" | "not_guilty";
+
+export type MoraleReport = {
+  id: string;
+  accusedMemberId: string;
+  accuserMemberId?: string;
+  content: string;
+  verdict: MoraleVerdict;
+  verdictReason?: string;
+  judgedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+};
 
 export type AppNotification = {
   id: string;
@@ -202,6 +218,7 @@ export type GameState = {
   auctionItems: AuctionItem[];
   treasures: Treasure[];
   submissions: MissionSubmission[];
+  moraleReports: MoraleReport[];
   eventLogs: EventLog[];
   notifications: AppNotification[];
   gameStatus: GameStatus;

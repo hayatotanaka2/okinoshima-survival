@@ -109,6 +109,11 @@ export function normalizeGameState(state: GameState): GameState {
       ...submission,
       imageUrls: submission.imageUrls ?? [submission.imageUrl].filter(Boolean),
     })),
+    moraleReports: (state.moraleReports ?? []).map((report) => ({
+      ...report,
+      verdict: report.verdict ?? "pending",
+      updatedAt: report.updatedAt ?? report.createdAt,
+    })),
   };
 }
 

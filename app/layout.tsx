@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { EmergencyMissionAlert } from "@/components/EmergencyMissionAlert";
+import { JudgmentAlert } from "@/components/JudgmentAlert";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -27,6 +28,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
       <body>
         {children}
         <EmergencyMissionAlert />
+        <JudgmentAlert />
       </body>
     </html>
   );

@@ -57,6 +57,25 @@ textarea {
   transform-origin: left;
 }
 
+.judgment-overlay {
+  animation: judgment-fade 5.2s ease both;
+}
+
+.judgment-card {
+  animation: judgment-card-in 0.34s cubic-bezier(0.18, 1.3, 0.26, 1) both;
+}
+
+.judgment-stamp {
+  animation: judgment-stamp 0.62s cubic-bezier(0.16, 1.4, 0.3, 1) both;
+}
+
+.judgment-speedline {
+  background:
+    repeating-linear-gradient(105deg, transparent 0 12px, rgba(255, 43, 147, 0.18) 13px 15px),
+    repeating-linear-gradient(75deg, transparent 0 18px, rgba(0, 191, 214, 0.14) 19px 21px);
+  animation: judgment-lines 0.52s linear infinite;
+}
+
 @keyframes emergency-fade {
   0% { opacity: 0; }
   6%, 88% { opacity: 1; }
@@ -82,12 +101,38 @@ textarea {
   to { transform: scaleX(0); }
 }
 
+@keyframes judgment-fade {
+  0% { opacity: 0; }
+  7%, 88% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes judgment-card-in {
+  0% { opacity: 0; transform: translateX(-22px) scale(0.72) rotate(-3deg); }
+  72% { opacity: 1; transform: translateX(8px) scale(1.04) rotate(1deg); }
+  100% { opacity: 1; transform: translateX(0) scale(1) rotate(0); }
+}
+
+@keyframes judgment-stamp {
+  0% { opacity: 0; transform: scale(2.4) rotate(-10deg); filter: blur(5px); }
+  55% { opacity: 1; transform: scale(0.92) rotate(2deg); filter: blur(0); }
+  100% { opacity: 1; transform: scale(1) rotate(-2deg); }
+}
+
+@keyframes judgment-lines {
+  to { transform: translateX(-34px); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .emergency-overlay,
   .emergency-panel,
   .emergency-orbit,
   .emergency-scan,
-  .emergency-progress {
+  .emergency-progress,
+  .judgment-overlay,
+  .judgment-card,
+  .judgment-stamp,
+  .judgment-speedline {
     animation: none;
   }
 }

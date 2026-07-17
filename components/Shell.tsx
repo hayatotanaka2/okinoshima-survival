@@ -9,7 +9,7 @@ const navItems = [
   { href: "/teams", label: "チーム", icon: "◆" },
   { href: "/missions", label: "任務", icon: "!" },
   { href: "/items", label: "物資", icon: "□" },
-  { href: "/admin", label: "管理", icon: "⚙" },
+  { href: "/morale", label: "士気", icon: "§" },
 ];
 
 export function Shell({ children, title }: { children: ReactNode; title?: string }) {

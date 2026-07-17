@@ -151,6 +151,7 @@ export const createInitialGameState = (): GameState => ({
   auctionItems: seedAuctionItems,
   treasures: seedTreasures,
   submissions: [],
+  moraleReports: [],
   eventLogs: [
     {
       id: "log-1",

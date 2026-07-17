@@ -15,6 +15,7 @@ const quickLinks = [
   ["/missions", "ミッション"],
   ["/items", "物資"],
   ["/auction", "オークション"],
+  ["/morale", "士気掲示板"],
   ["/admin", "管理者"],
 ];
 
